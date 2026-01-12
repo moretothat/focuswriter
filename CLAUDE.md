@@ -7,32 +7,32 @@
 ### How to Start Working on This App
 ```
 1. Open Terminal
-2. Type: cd ~/FocusWriter
+2. Type: cd ~/Coding/FocusWriter
 3. Type: claude
 4. Tell Claude what you want to change!
 ```
 
 ### How to Test Your Changes
 ```
-In Terminal (from ~/FocusWriter folder):
+In Terminal (from ~/Coding/FocusWriter folder):
 npm start
 ```
 This opens the app so you can see your changes. Press Ctrl+C in Terminal to close it.
 
 ### How to Build a Final Version (for selling/sharing)
 ```
-In Terminal (from ~/FocusWriter folder):
+In Terminal (from ~/Coding/FocusWriter folder):
 npm run build
 ```
-This creates the distributable app at: `~/FocusWriter/dist/FocusWriter-1.0.0-arm64.dmg`
+This creates the distributable app at: `~/Coding/FocusWriter/dist/FocusWriter-1.0.0-arm64.dmg`
 
 ### Which App to Open?
-- **For testing changes:** Use `npm start` in Terminal, OR open `/Users/lawrenceyeo/FocusWriter/dist/mac-arm64/FocusWriter.app`
+- **For testing changes:** Use `npm start` in Terminal, OR open `~/Coding/FocusWriter/dist/mac-arm64/FocusWriter.app`
 - **For regular use:** Use `/Applications/FocusWriter.app` (this is a copy that doesn't update with changes)
 
 ### How to Save Changes to GitHub
 ```
-In Terminal (from ~/FocusWriter folder):
+In Terminal (from ~/Coding/FocusWriter folder):
 git add -A
 git commit -m "Description of what you changed"
 git push
@@ -41,7 +41,7 @@ Or just ask Claude to do this for you!
 
 ### How to Update the App in /Applications (after making changes)
 ```
-In Terminal (from ~/FocusWriter folder):
+In Terminal (from ~/Coding/FocusWriter folder):
 npm run build
 cp -R dist/mac-arm64/FocusWriter.app /Applications/
 ```
