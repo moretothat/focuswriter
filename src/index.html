@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FocusWriter</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0d0d0d;
+      --bg-secondary: #1a1a1a;
+      --bg-tertiary: #252525;
+      --text-primary: #e0e0e0;
+      --text-secondary: #888;
+      --text-muted: #555;
+      --accent: #4a9eff;
+      --accent-hover: #6bb3ff;
+      --danger: #ff4757;
+      --success: #2ed573;
+      --progress-bg: #333;
+      --progress-fill: #4a9eff;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Custom window drag region */
+    .title-bar {
+      -webkit-app-region: drag;
+      height: 28px;
+      background: var(--bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    .title-bar-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* Setup Screen */
+    .setup-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 20px;
+      transition: opacity 0.3s ease;
+    }
+
+    .setup-screen.hidden {
+      display: none;
+    }
+
+    .logo {
+      font-size: 48px;
+      font-weight: 300;
+      margin-bottom: 10px;
+      letter-spacing: -2px;
+      color: var(--text-primary);
+    }
+
+    .tagline {
+      color: var(--text-secondary);
+      margin-bottom: 60px;
+      font-size: 16px;
+    }
+
+    .time-input-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+
+    .time-input-label {
+      color: var(--text-secondary);
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    .time-input-row {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .time-input {
+      width: 120px;
+      padding: 15px 20px;
+      font-size: 32px;
+      text-align: center;
+      background: var(--bg-tertiary);
+      border: 2px solid var(--bg-tertiary);
+      border-radius: 12px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .time-input:focus {
+      border-color: var(--accent);
+    }
+
+    .time-unit {
+      font-size: 18px;
+      color: var(--text-secondary);
+    }
+
+    .preset-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .preset-btn {
+      padding: 10px 20px;
+      background: var(--bg-tertiary);
+      border: none;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .preset-btn:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    .start-btn {
+      padding: 18px 60px;
+      font-size: 18px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+      margin-top: 20px;
+    }
+
+    .start-btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+    }
+
+    .start-btn:disabled {
+      background: var(--bg-tertiary);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .warning-text {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-top: 30px;
+      text-align: center;
+      max-width: 400px;
+      line-height: 1.6;
+    }
+
+    /* Writing Screen */
+    .writing-screen {
+      display: none;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .writing-screen.active {
+      display: flex;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      background: var(--bg-secondary);
+      padding: 0;
+      position: relative;
+      height: 40px;
+      display: flex;
+      align-items: center;
+    }
+
+    .progress-bar-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--progress-bg);
+    }
+
+    .progress-bar-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, var(--accent), #6dd5ed);
+      transition: width 0.5s linear;
+      width: 100%;
+    }
+
+    .progress-info {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 0 20px;
+    }
+
+    .time-remaining {
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .word-count {
+      font-size: 12px;
+      color: rgba(255,255,255,0.8);
+    }
+
+    .emergency-btn {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px 10px;
+    }
+
+    .emergency-btn:hover {
+      color: rgba(255,255,255,0.8);
+    }
+
+    /* Editor Area */
+    .editor-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      overflow: hidden;
+      background: var(--bg-primary);
+    }
+
+    .editor {
+      width: 100%;
+      max-width: 750px;
+      height: 100%;
+      padding: 60px 40px;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: 18px;
+      line-height: 1.8;
+      resize: none;
+      overflow-y: auto;
+    }
+
+    .editor::placeholder {
+      color: var(--text-muted);
+    }
+
+    .editor::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .editor::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .editor::-webkit-scrollbar-thumb {
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+    }
+
+    /* Session Complete Screen */
+    .complete-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .complete-screen.active {
+      display: flex;
+    }
+
+    .complete-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    .complete-title {
+      font-size: 32px;
+      font-weight: 300;
+      margin-bottom: 10px;
+    }
+
+    .complete-stats {
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+      font-size: 16px;
+    }
+
+    .complete-buttons {
+      display: flex;
+      gap: 15px;
+    }
+
+    .complete-btn {
+      padding: 15px 30px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .export-btn {
+      background: var(--accent);
+      color: white;
+    }
+
+    .export-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .new-session-btn {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .new-session-btn:hover {
+      background: var(--bg-secondary);
+    }
+
+    /* Emergency Exit Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--bg-secondary);
+      padding: 40px;
+      border-radius: 16px;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    .modal-title {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: var(--danger);
+    }
+
+    .modal-text {
+      color: var(--text-secondary);
+      margin-bottom: 25px;
+      line-height: 1.6;
+    }
+
+    .modal-phrase {
+      background: var(--bg-tertiary);
+      padding: 15px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 14px;
+      color: var(--accent);
+      margin-bottom: 20px;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 15px;
+      font-size: 14px;
+      background: var(--bg-tertiary);
+      border: 2px solid var(--bg-tertiary);
+      border-radius: 8px;
+      color: var(--text-primary);
+      outline: none;
+      margin-bottom: 20px;
+    }
+
+    .modal-input:focus {
+      border-color: var(--danger);
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .modal-cancel {
+      padding: 12px 25px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .modal-confirm {
+      padding: 12px 25px;
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .modal-confirm:hover {
+      background: var(--danger);
+      color: white;
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .pulse {
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    /* Saving indicator */
+    .save-indicator {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 8px 16px;
+      background: var(--bg-tertiary);
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .save-indicator.visible {
+      opacity: 1;
+    }
+
+    .save-indicator.saved {
+      color: var(--success);
+    }
+  </style>
+</head>
+<body>
+  <!-- Title Bar (for windowed mode) -->
+  <div class="title-bar" id="titleBar">
+    <span class="title-bar-text">FocusWriter</span>
+  </div>
+
+  <!-- Setup Screen -->
+  <div class="setup-screen" id="setupScreen">
+    <h1 class="logo">FocusWriter</h1>
+    <p class="tagline">Lock in. Write. No distractions.</p>
+
+    <div class="time-input-container">
+      <label class="time-input-label">How long do you want to write?</label>
+      <div class="time-input-row">
+        <input type="number" class="time-input" id="timeInput" min="1" max="480" value="30">
+        <span class="time-unit">minutes</span>
+      </div>
+      <div class="preset-buttons">
+        <button class="preset-btn" data-minutes="15">15 min</button>
+        <button class="preset-btn" data-minutes="30">30 min</button>
+        <button class="preset-btn" data-minutes="60">1 hour</button>
+        <button class="preset-btn" data-minutes="120">2 hours</button>
+      </div>
+    </div>
+
+    <button class="start-btn" id="startBtn">Begin Writing Session</button>
+
+    <p class="warning-text">
+      Once you start, your screen will be locked to this app until time is up.
+      Your work is auto-saved continuously. Make sure you're ready!
+    </p>
+  </div>
+
+  <!-- Writing Screen -->
+  <div class="writing-screen" id="writingScreen">
+    <div class="progress-container">
+      <div class="progress-bar-bg"></div>
+      <div class="progress-bar-fill" id="progressFill"></div>
+      <div class="progress-info">
+        <span class="time-remaining" id="timeRemaining">30:00 remaining</span>
+        <span class="word-count" id="wordCount">0 words</span>
+        <button class="emergency-btn" id="emergencyBtn">Emergency Exit</button>
+      </div>
+    </div>
+
+    <div class="editor-container">
+      <textarea
+        class="editor"
+        id="editor"
+        placeholder="Start writing... Your thoughts are safe here."
+        autofocus
+      ></textarea>
+    </div>
+  </div>
+
+  <!-- Session Complete Screen -->
+  <div class="complete-screen" id="completeScreen">
+    <div class="complete-icon">&#10003;</div>
+    <h2 class="complete-title">Session Complete!</h2>
+    <p class="complete-stats" id="completeStats">You wrote 0 words in 30 minutes.</p>
+
+    <div class="complete-buttons">
+      <button class="complete-btn export-btn" id="exportBtn">Export Document</button>
+      <button class="complete-btn new-session-btn" id="newSessionBtn">Start New Session</button>
+    </div>
+  </div>
+
+  <!-- Emergency Exit Modal -->
+  <div class="modal-overlay" id="emergencyModal">
+    <div class="modal">
+      <h3 class="modal-title">Emergency Exit</h3>
+      <p class="modal-text">
+        Are you sure? Leaving early defeats the purpose of focused writing.
+        If you really need to exit, type the phrase below exactly:
+      </p>
+      <div class="modal-phrase">
+        I understand this defeats the purpose of focused writing
+      </div>
+      <input
+        type="text"
+        class="modal-input"
+        id="emergencyInput"
+        placeholder="Type the phrase above..."
+      >
+      <div class="modal-buttons">
+        <button class="modal-cancel" id="modalCancel">Keep Writing</button>
+        <button class="modal-confirm" id="modalConfirm">Exit Anyway</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save Indicator -->
+  <div class="save-indicator" id="saveIndicator">Saving...</div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    // Elements
+    const setupScreen = document.getElementById('setupScreen');
+    const writingScreen = document.getElementById('writingScreen');
+    const completeScreen = document.getElementById('completeScreen');
+    const titleBar = document.getElementById('titleBar');
+
+    const timeInput = document.getElementById('timeInput');
+    const startBtn = document.getElementById('startBtn');
+    const presetBtns = document.querySelectorAll('.preset-btn');
+
+    const progressFill = document.getElementById('progressFill');
+    const timeRemaining = document.getElementById('timeRemaining');
+    const wordCount = document.getElementById('wordCount');
+    const editor = document.getElementById('editor');
+    const emergencyBtn = document.getElementById('emergencyBtn');
+
+    const emergencyModal = document.getElementById('emergencyModal');
+    const emergencyInput = document.getElementById('emergencyInput');
+    const modalCancel = document.getElementById('modalCancel');
+    const modalConfirm = document.getElementById('modalConfirm');
+
+    const completeStats = document.getElementById('completeStats');
+    const exportBtn = document.getElementById('exportBtn');
+    const newSessionBtn = document.getElementById('newSessionBtn');
+
+    const saveIndicator = document.getElementById('saveIndicator');
+
+    // State
+    let sessionEndTime = null;
+    let sessionDuration = 0;
+    let timerInterval = null;
+    let autoSaveInterval = null;
+    let lastSavedContent = '';
+
+    // Preset buttons
+    presetBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        timeInput.value = btn.dataset.minutes;
+      });
+    });
+
+    // Start session
+    startBtn.addEventListener('click', async () => {
+      const minutes = parseInt(timeInput.value);
+      if (minutes < 1 || minutes > 480) {
+        alert('Please enter a time between 1 and 480 minutes.');
+        return;
+      }
+
+      sessionDuration = minutes;
+
+      // Load any previous content
+      const savedContent = await ipcRenderer.invoke('load-document', 'autosave.txt');
+      editor.value = savedContent;
+      lastSavedContent = savedContent;
+      updateWordCount();
+
+      // Start the session
+      const result = await ipcRenderer.invoke('start-session', minutes);
+      sessionEndTime = result.endTime;
+
+      // Switch screens
+      setupScreen.classList.add('hidden');
+      writingScreen.classList.add('active');
+      titleBar.style.display = 'none';
+
+      // Focus editor
+      setTimeout(() => editor.focus(), 100);
+
+      // Start timer
+      startTimer();
+
+      // Start auto-save
+      startAutoSave();
+    });
+
+    // Timer
+    function startTimer() {
+      updateTimer();
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+      const now = Date.now();
+      const remaining = Math.max(0, sessionEndTime - now);
+
+      if (remaining <= 0) {
+        endSession();
+        return;
+      }
+
+      const totalDuration = sessionDuration * 60 * 1000;
+      const elapsed = totalDuration - remaining;
+      const progress = (elapsed / totalDuration) * 100;
+
+      progressFill.style.width = `${100 - progress}%`;
+
+      const minutes = Math.floor(remaining / 60000);
+      const seconds = Math.floor((remaining % 60000) / 1000);
+      timeRemaining.textContent = `${minutes}:${seconds.toString().padStart(2, '0')} remaining`;
+    }
+
+    // Word count
+    function updateWordCount() {
+      const text = editor.value.trim();
+      const words = text ? text.split(/\s+/).length : 0;
+      wordCount.textContent = `${words} word${words !== 1 ? 's' : ''}`;
+    }
+
+    editor.addEventListener('input', updateWordCount);
+
+    // Auto-save
+    function startAutoSave() {
+      autoSaveInterval = setInterval(async () => {
+        if (editor.value !== lastSavedContent) {
+          saveIndicator.textContent = 'Saving...';
+          saveIndicator.classList.remove('saved');
+          saveIndicator.classList.add('visible');
+
+          await ipcRenderer.invoke('save-document', editor.value, 'autosave.txt');
+          lastSavedContent = editor.value;
+
+          saveIndicator.textContent = 'Saved';
+          saveIndicator.classList.add('saved');
+
+          setTimeout(() => {
+            saveIndicator.classList.remove('visible');
+          }, 1500);
+        }
+      }, 3000);
+    }
+
+    // End session
+    async function endSession() {
+      clearInterval(timerInterval);
+      clearInterval(autoSaveInterval);
+
+      // Final save
+      await ipcRenderer.invoke('save-document', editor.value, 'autosave.txt');
+
+      // End the lock
+      await ipcRenderer.invoke('end-session');
+
+      // Calculate stats
+      const text = editor.value.trim();
+      const words = text ? text.split(/\s+/).length : 0;
+      completeStats.textContent = `You wrote ${words} word${words !== 1 ? 's' : ''} in ${sessionDuration} minutes.`;
+
+      // Switch screens
+      writingScreen.classList.remove('active');
+      completeScreen.classList.add('active');
+      titleBar.style.display = 'flex';
+    }
+
+    // Emergency exit
+    emergencyBtn.addEventListener('click', () => {
+      emergencyModal.classList.add('active');
+      emergencyInput.value = '';
+      emergencyInput.focus();
+    });
+
+    modalCancel.addEventListener('click', () => {
+      emergencyModal.classList.remove('active');
+      editor.focus();
+    });
+
+    modalConfirm.addEventListener('click', async () => {
+      const result = await ipcRenderer.invoke('emergency-exit', emergencyInput.value);
+      if (result) {
+        emergencyModal.classList.remove('active');
+        endSession();
+      } else {
+        emergencyInput.value = '';
+        emergencyInput.placeholder = 'Phrase does not match. Try again...';
+      }
+    });
+
+    emergencyInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        emergencyModal.classList.remove('active');
+        editor.focus();
+      }
+    });
+
+    // Export
+    exportBtn.addEventListener('click', async () => {
+      await ipcRenderer.invoke('export-document', editor.value);
+    });
+
+    // New session
+    newSessionBtn.addEventListener('click', () => {
+      completeScreen.classList.remove('active');
+      setupScreen.classList.remove('hidden');
+      timeInput.focus();
+    });
+
+    // Handle close attempts
+    ipcRenderer.on('close-attempted', () => {
+      // Flash the progress bar or show warning
+      progressFill.style.background = 'linear-gradient(90deg, #ff4757, #ff6b7a)';
+      setTimeout(() => {
+        progressFill.style.background = 'linear-gradient(90deg, var(--accent), #6dd5ed)';
+      }, 500);
+    });
+
+    // Prevent some keyboard shortcuts in renderer
+    document.addEventListener('keydown', (e) => {
+      // Prevent Cmd+W, Cmd+Q, etc.
+      if ((e.metaKey || e.ctrlKey) && ['w', 'q', 'n', 'h'].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+      }
+    });
+
+    // Disable context menu
+    document.addEventListener('contextmenu', (e) => {
+      if (writingScreen.classList.contains('active')) {
+        e.preventDefault();
+      }
+    });
+
+    // Initial focus
+    timeInput.focus();
+  </script>
+</body>
+</html>
