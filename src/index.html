@@ -12,18 +12,20 @@
     }
 
     :root {
-      --bg-primary: #0d0d0d;
-      --bg-secondary: #1a1a1a;
-      --bg-tertiary: #252525;
-      --text-primary: #e0e0e0;
-      --text-secondary: #888;
-      --text-muted: #555;
-      --accent: #4a9eff;
-      --accent-hover: #6bb3ff;
-      --danger: #ff4757;
-      --success: #2ed573;
-      --progress-bg: #333;
-      --progress-fill: #4a9eff;
+      /* Light mode colors */
+      --bg-primary: #f0f2f5;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #e4e6eb;
+      --bg-box: #e8ebf0;
+      --text-primary: #1a1a2e;
+      --text-secondary: #65676b;
+      --text-muted: #8a8d91;
+      --accent: #4a7c9b;
+      --accent-light: #a8c5d8;
+      --accent-dark: #3d6a85;
+      --danger: #dc3545;
+      --success: #28a745;
+      --border: #dddfe2;
     }
 
     body {
@@ -39,11 +41,8 @@
     /* Custom window drag region */
     .title-bar {
       -webkit-app-region: drag;
-      height: 28px;
-      background: var(--bg-secondary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      height: 32px;
+      background: var(--bg-primary);
       position: fixed;
       top: 0;
       left: 0;
@@ -51,21 +50,14 @@
       z-index: 1000;
     }
 
-    .title-bar-text {
-      font-size: 12px;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-
     /* Setup Screen */
     .setup-screen {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       height: 100vh;
       padding: 20px;
-      transition: opacity 0.3s ease;
+      padding-top: 40px;
     }
 
     .setup-screen.hidden {
@@ -73,113 +65,230 @@
     }
 
     .logo {
-      font-size: 48px;
-      font-weight: 300;
-      margin-bottom: 10px;
-      letter-spacing: -2px;
-      color: var(--text-primary);
+      font-size: 36px;
+      font-weight: 600;
+      margin-bottom: 0;
+      letter-spacing: -1px;
     }
 
-    .tagline {
-      color: var(--text-secondary);
-      margin-bottom: 60px;
-      font-size: 16px;
+    .setup-spacer {
+      flex: 1;
     }
 
-    .time-input-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 40px;
+    .logo-focus {
+      color: var(--accent-dark);
     }
 
-    .time-input-label {
-      color: var(--text-secondary);
-      margin-bottom: 15px;
-      font-size: 14px;
+    .logo-writer {
+      color: var(--text-muted);
+      font-weight: 400;
     }
 
-    .time-input-row {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .time-input {
-      width: 120px;
-      padding: 15px 20px;
-      font-size: 32px;
-      text-align: center;
-      background: var(--bg-tertiary);
-      border: 2px solid var(--bg-tertiary);
+    /* Main Card */
+    .main-card {
+      background: var(--bg-box);
       border-radius: 12px;
+      padding: 30px 40px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 25px;
+      gap: 0;
+    }
+
+    .tab {
+      padding: 10px 24px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .tab:first-child {
+      border-radius: 6px 0 0 6px;
+    }
+
+    .tab:last-child {
+      border-radius: 0 6px 6px 0;
+      border-left: none;
+    }
+
+    .tab.active {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border-color: var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .tab:hover:not(.active) {
+      background: var(--bg-tertiary);
+    }
+
+    /* Tab Content */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Info text */
+    .info-text {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    /* File chooser row */
+    .file-chooser-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    .file-path-input {
+      flex: 1;
+      padding: 10px 14px;
+      font-size: 14px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
       color: var(--text-primary);
       outline: none;
-      transition: border-color 0.2s;
     }
 
-    .time-input:focus {
+    .file-path-input:focus {
       border-color: var(--accent);
     }
 
-    .time-unit {
-      font-size: 18px;
-      color: var(--text-secondary);
+    .file-path-input::placeholder {
+      color: var(--text-muted);
     }
 
-    .preset-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
+    .choose-btn {
+      padding: 10px 18px;
+      font-size: 14px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-primary);
+      cursor: pointer;
+      white-space: nowrap;
     }
 
-    .preset-btn {
-      padding: 10px 20px;
+    .choose-btn:hover {
       background: var(--bg-tertiary);
-      border: none;
-      border-radius: 8px;
-      color: var(--text-secondary);
+    }
+
+    /* Block options */
+    .block-section {
+      margin-bottom: 20px;
+    }
+
+    .block-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--text-primary);
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    .block-input {
+      width: 80px;
+      padding: 8px 12px;
+      font-size: 14px;
+      text-align: center;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .block-input:focus {
+      border-color: var(--accent);
+    }
+
+    /* Radio options */
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       cursor: pointer;
       font-size: 14px;
-      transition: all 0.2s;
+      color: var(--text-primary);
     }
 
-    .preset-btn:hover {
-      background: var(--accent);
-      color: white;
-    }
-
-    .start-btn {
-      padding: 18px 60px;
-      font-size: 18px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 12px;
+    .radio-option input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
       cursor: pointer;
-      font-weight: 600;
+    }
+
+    /* Buttons */
+    .button-row {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .btn {
+      padding: 12px 32px;
+      font-size: 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
       transition: all 0.2s;
-      margin-top: 20px;
+      border: 1px solid var(--border);
     }
 
-    .start-btn:hover {
-      background: var(--accent-hover);
-      transform: translateY(-2px);
+    .btn-secondary {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
     }
 
-    .start-btn:disabled {
+    .btn-secondary:hover {
       background: var(--bg-tertiary);
-      cursor: not-allowed;
-      transform: none;
     }
 
-    .warning-text {
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-dark);
+    }
+
+    .btn-primary:disabled {
+      background: var(--bg-tertiary);
+      border-color: var(--border);
       color: var(--text-muted);
-      font-size: 13px;
-      margin-top: 30px;
-      text-align: center;
-      max-width: 400px;
-      line-height: 1.6;
+      cursor: not-allowed;
     }
 
     /* Writing Screen */
@@ -187,99 +296,131 @@
       display: none;
       flex-direction: column;
       height: 100vh;
+      background: var(--bg-primary);
     }
 
     .writing-screen.active {
       display: flex;
     }
 
-    /* Progress Bar */
-    .progress-container {
-      background: var(--bg-secondary);
-      padding: 0;
-      position: relative;
-      height: 40px;
-      display: flex;
-      align-items: center;
+    /* New Header Design */
+    .writing-header {
+      padding: 25px 20px 20px;
+      text-align: center;
+      background: var(--bg-primary);
+      min-height: 100px;
     }
 
-    .progress-bar-bg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: var(--progress-bg);
+    .writing-logo {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .writing-logo .logo-focus {
+      color: var(--accent-dark);
+    }
+
+    .writing-logo .logo-writer {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* Progress/Snooze area - fixed height to prevent layout shift */
+    .progress-snooze-area {
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Subtle progress bar */
+    .progress-bar-container {
+      width: 200px;
+      height: 4px;
+      background: var(--bg-tertiary);
+      border-radius: 2px;
+      overflow: hidden;
+      transition: opacity 0.4s ease;
+    }
+
+    .progress-bar-container.hidden {
+      opacity: 0;
+      pointer-events: none;
     }
 
     .progress-bar-fill {
-      position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      background: linear-gradient(90deg, var(--accent), #6dd5ed);
-      transition: width 0.5s linear;
-      width: 100%;
+      height: 100%;
+      background: var(--accent-light);
+      border-radius: 2px;
+      transition: width 1s linear;
+      width: 0%;
     }
 
-    .progress-info {
-      position: relative;
-      z-index: 1;
+    /* Snooze options (shown when session ends) */
+    .snooze-options {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      padding: 0 20px;
+      justify-content: center;
+      gap: 30px;
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
     }
 
-    .time-remaining {
-      font-size: 14px;
-      font-weight: 600;
-      color: white;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    .snooze-options.active {
+      opacity: 1;
+      pointer-events: auto;
     }
 
-    .word-count {
-      font-size: 12px;
-      color: rgba(255,255,255,0.8);
-    }
-
-    .emergency-btn {
-      font-size: 11px;
-      color: rgba(255,255,255,0.5);
+    .snooze-btn {
+      font-size: 13px;
+      color: var(--text-secondary);
       background: none;
       border: none;
       cursor: pointer;
       padding: 5px 10px;
     }
 
-    .emergency-btn:hover {
-      color: rgba(255,255,255,0.8);
+    .snooze-btn:hover {
+      color: var(--text-primary);
     }
 
     /* Editor Area */
-    .editor-container {
+    .editor-wrapper {
       flex: 1;
       display: flex;
       justify-content: center;
+      padding: 20px 40px 0;
       overflow: hidden;
-      background: var(--bg-primary);
+    }
+
+    .editor-container {
+      width: 100%;
+      max-width: 850px;
+      background: var(--bg-secondary);
+      border-radius: 4px 4px 0 0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     .editor {
       width: 100%;
-      max-width: 750px;
       height: 100%;
-      padding: 60px 40px;
+      padding: 70px 80px 40px;
       background: transparent;
       border: none;
       outline: none;
-      color: var(--text-primary);
-      font-family: 'Georgia', 'Times New Roman', serif;
-      font-size: 18px;
+      color: #5a7d9a;
+      font-family: var(--editor-font, 'Baskerville', 'Georgia', serif);
+      font-size: var(--editor-font-size, 20px);
       line-height: 1.8;
       resize: none;
-      overflow-y: auto;
+      overflow-y: scroll;
+      flex: 1;
     }
 
     .editor::placeholder {
@@ -299,70 +440,6 @@
       border-radius: 4px;
     }
 
-    /* Session Complete Screen */
-    .complete-screen {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      padding: 40px;
-      text-align: center;
-    }
-
-    .complete-screen.active {
-      display: flex;
-    }
-
-    .complete-icon {
-      font-size: 64px;
-      margin-bottom: 20px;
-    }
-
-    .complete-title {
-      font-size: 32px;
-      font-weight: 300;
-      margin-bottom: 10px;
-    }
-
-    .complete-stats {
-      color: var(--text-secondary);
-      margin-bottom: 40px;
-      font-size: 16px;
-    }
-
-    .complete-buttons {
-      display: flex;
-      gap: 15px;
-    }
-
-    .complete-btn {
-      padding: 15px 30px;
-      font-size: 16px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .export-btn {
-      background: var(--accent);
-      color: white;
-    }
-
-    .export-btn:hover {
-      background: var(--accent-hover);
-    }
-
-    .new-session-btn {
-      background: var(--bg-tertiary);
-      color: var(--text-primary);
-    }
-
-    .new-session-btn:hover {
-      background: var(--bg-secondary);
-    }
-
     /* Emergency Exit Modal */
     .modal-overlay {
       display: none;
@@ -371,7 +448,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.9);
+      background: rgba(0, 0, 0, 0.5);
       z-index: 2000;
       align-items: center;
       justify-content: center;
@@ -384,9 +461,10 @@
     .modal {
       background: var(--bg-secondary);
       padding: 40px;
-      border-radius: 16px;
+      border-radius: 12px;
       max-width: 500px;
       text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     }
 
     .modal-title {
@@ -407,7 +485,7 @@
       border-radius: 8px;
       font-family: monospace;
       font-size: 14px;
-      color: var(--accent);
+      color: var(--accent-dark);
       margin-bottom: 20px;
       user-select: text;
       -webkit-user-select: text;
@@ -417,8 +495,8 @@
       width: 100%;
       padding: 15px;
       font-size: 14px;
-      background: var(--bg-tertiary);
-      border: 2px solid var(--bg-tertiary);
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
       border-radius: 8px;
       color: var(--text-primary);
       outline: none;
@@ -458,103 +536,280 @@
       color: white;
     }
 
-    /* Animations */
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
-
-    .pulse {
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    /* Saving indicator */
-    .save-indicator {
+    /* Settings Button */
+    .settings-btn {
       position: fixed;
       bottom: 20px;
-      right: 20px;
-      padding: 8px 16px;
+      left: 20px;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
       background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      z-index: 100;
+    }
+
+    .settings-btn:hover {
+      background: var(--bg-secondary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .settings-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--text-secondary);
+    }
+
+    /* Settings Popup */
+    .settings-popup {
+      position: fixed;
+      bottom: 65px;
+      left: 20px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      min-width: 220px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      z-index: 101;
+      display: none;
+    }
+
+    .settings-popup.active {
+      display: block;
+    }
+
+    .settings-section {
+      margin-bottom: 18px;
+    }
+
+    .settings-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .settings-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .settings-options {
+      display: flex;
+      gap: 6px;
+    }
+
+    .settings-option {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 13px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
       border-radius: 6px;
-      font-size: 12px;
-      color: var(--text-secondary);
-      opacity: 0;
-      transition: opacity 0.3s;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      color: var(--text-primary);
     }
 
-    .save-indicator.visible {
-      opacity: 1;
+    .settings-option:hover {
+      background: var(--bg-primary);
     }
 
-    .save-indicator.saved {
-      color: var(--success);
+    .settings-option.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
     }
+
+    .settings-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .settings-toggle-label {
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid var(--border);
+    }
+
+    .toggle-switch.active {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      transition: all 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .toggle-switch.active::after {
+      left: 22px;
+    }
+
+    /* Dark Mode */
+    body.dark-mode {
+      --bg-primary: #1a1a2e;
+      --bg-secondary: #25253a;
+      --bg-tertiary: #2d2d44;
+      --bg-box: #2d2d44;
+      --text-primary: #e4e4e7;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --border: #3f3f5a;
+    }
+
+    body.dark-mode .editor {
+      color: #a8c5d8;
+    }
+
   </style>
 </head>
 <body>
   <!-- Title Bar (for windowed mode) -->
-  <div class="title-bar" id="titleBar">
-    <span class="title-bar-text">FocusWriter</span>
-  </div>
+  <div class="title-bar" id="titleBar"></div>
 
   <!-- Setup Screen -->
   <div class="setup-screen" id="setupScreen">
-    <h1 class="logo">FocusWriter</h1>
-    <p class="tagline">Lock in. Write. No distractions.</p>
+    <h1 class="logo">
+      <span class="logo-focus">FocusWriter</span>
+    </h1>
 
-    <div class="time-input-container">
-      <label class="time-input-label">How long do you want to write?</label>
-      <div class="time-input-row">
-        <input type="number" class="time-input" id="timeInput" min="1" max="480" value="30">
-        <span class="time-unit">minutes</span>
+    <div class="setup-spacer"></div>
+
+    <div class="main-card">
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" id="tabNewDraft">New Draft</button>
+        <button class="tab" id="tabOpenDraft">Open Draft</button>
       </div>
-      <div class="preset-buttons">
-        <button class="preset-btn" data-minutes="15">15 min</button>
-        <button class="preset-btn" data-minutes="30">30 min</button>
-        <button class="preset-btn" data-minutes="60">1 hour</button>
-        <button class="preset-btn" data-minutes="120">2 hours</button>
+
+      <!-- New Draft Tab -->
+      <div class="tab-content active" id="contentNewDraft">
+        <p class="info-text">
+          You'll be able to save your work when you finish. Periodic<br>
+          auto-saves are stored in your documents folder.
+        </p>
+
+        <div class="block-section">
+          <div class="block-label">
+            Block everything until:
+            <input type="number" class="block-input" id="blockValue" min="1" placeholder="">
+          </div>
+
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="blockMode" value="words" checked>
+              Words are typed.
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="blockMode" value="time">
+              Minutes from now.
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="blockMode" value="none">
+              Don't block me.
+            </label>
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button class="btn btn-secondary" id="quitBtn">Quit</button>
+          <button class="btn btn-primary" id="startBtn">Start</button>
+        </div>
+      </div>
+
+      <!-- Open Draft Tab -->
+      <div class="tab-content" id="contentOpenDraft">
+        <div class="file-chooser-row">
+          <input type="text" class="file-path-input" id="filePathInput" placeholder="" readonly>
+          <button class="choose-btn" id="chooseFileBtn">Choose...</button>
+        </div>
+
+        <div class="block-section">
+          <div class="block-label">
+            Block everything until:
+            <input type="number" class="block-input" id="blockValue2" min="1" placeholder="">
+          </div>
+
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="blockMode2" value="words" checked>
+              Words are added.
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="blockMode2" value="time">
+              Minutes from now.
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="blockMode2" value="none">
+              Don't block me.
+            </label>
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button class="btn btn-secondary" id="quitBtn2">Quit</button>
+          <button class="btn btn-primary" id="startBtn2" disabled>Start</button>
+        </div>
       </div>
     </div>
 
-    <button class="start-btn" id="startBtn">Begin Writing Session</button>
-
-    <p class="warning-text">
-      Once you start, your screen will be locked to this app until time is up.
-      Your work is auto-saved continuously. Make sure you're ready!
-    </p>
+    <div class="setup-spacer"></div>
   </div>
 
   <!-- Writing Screen -->
   <div class="writing-screen" id="writingScreen">
-    <div class="progress-container">
-      <div class="progress-bar-bg"></div>
-      <div class="progress-bar-fill" id="progressFill"></div>
-      <div class="progress-info">
-        <span class="time-remaining" id="timeRemaining">30:00 remaining</span>
-        <span class="word-count" id="wordCount">0 words</span>
-        <button class="emergency-btn" id="emergencyBtn">Emergency Exit</button>
+    <div class="writing-header">
+      <div class="writing-logo">
+        <span class="logo-focus">FocusWriter</span>
+      </div>
+      <div class="progress-snooze-area">
+        <div class="progress-bar-container" id="progressBarContainer">
+          <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+        <div class="snooze-options" id="snoozeOptions">
+          <button class="snooze-btn" id="snoozeBtn">Snooze (10 min)</button>
+          <button class="snooze-btn" id="saveQuitBtn">Save and Quit</button>
+        </div>
       </div>
     </div>
 
-    <div class="editor-container">
-      <textarea
-        class="editor"
-        id="editor"
-        placeholder="Start writing... Your thoughts are safe here."
-        autofocus
-      ></textarea>
-    </div>
-  </div>
-
-  <!-- Session Complete Screen -->
-  <div class="complete-screen" id="completeScreen">
-    <div class="complete-icon">&#10003;</div>
-    <h2 class="complete-title">Session Complete!</h2>
-    <p class="complete-stats" id="completeStats">You wrote 0 words in 30 minutes.</p>
-
-    <div class="complete-buttons">
-      <button class="complete-btn export-btn" id="exportBtn">Export Document</button>
-      <button class="complete-btn new-session-btn" id="newSessionBtn">Start New Session</button>
+    <div class="editor-wrapper">
+      <div class="editor-container">
+        <textarea
+          class="editor"
+          id="editor"
+          placeholder="Start writing..."
+          autofocus
+        ></textarea>
+      </div>
     </div>
   </div>
 
@@ -582,8 +837,38 @@
     </div>
   </div>
 
-  <!-- Save Indicator -->
-  <div class="save-indicator" id="saveIndicator">Saving...</div>
+  <!-- Settings Button -->
+  <button class="settings-btn" id="settingsBtn">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"/>
+      <path d="M19.4 15C19.2669 15.3016 19.2272 15.6362 19.286 15.9606C19.3448 16.285 19.4995 16.5843 19.73 16.82L19.79 16.88C19.976 17.0657 20.1235 17.2863 20.2241 17.5291C20.3248 17.7719 20.3766 18.0322 20.3766 18.295C20.3766 18.5578 20.3248 18.8181 20.2241 19.0609C20.1235 19.3037 19.976 19.5243 19.79 19.71C19.6043 19.896 19.3837 20.0435 19.1409 20.1441C18.8981 20.2448 18.6378 20.2966 18.375 20.2966C18.1122 20.2966 17.8519 20.2448 17.6091 20.1441C17.3663 20.0435 17.1457 19.896 16.96 19.71L16.9 19.65C16.6643 19.4195 16.365 19.2648 16.0406 19.206C15.7162 19.1472 15.3816 19.1869 15.08 19.32C14.7842 19.4468 14.532 19.6572 14.3543 19.9255C14.1766 20.1938 14.0813 20.5082 14.08 20.83V21C14.08 21.5304 13.8693 22.0391 13.4942 22.4142C13.1191 22.7893 12.6104 23 12.08 23C11.5496 23 11.0409 22.7893 10.6658 22.4142C10.2907 22.0391 10.08 21.5304 10.08 21V20.91C10.0723 20.579 9.96512 20.258 9.77251 19.9887C9.5799 19.7194 9.31074 19.5143 9 19.4C8.69838 19.2669 8.36381 19.2272 8.03941 19.286C7.71502 19.3448 7.41568 19.4995 7.18 19.73L7.12 19.79C6.93425 19.976 6.71368 20.1235 6.47088 20.2241C6.22808 20.3248 5.96783 20.3766 5.705 20.3766C5.44217 20.3766 5.18192 20.3248 4.93912 20.2241C4.69632 20.1235 4.47575 19.976 4.29 19.79C4.10405 19.6043 3.95653 19.3837 3.85588 19.1409C3.75523 18.8981 3.70343 18.6378 3.70343 18.375C3.70343 18.1122 3.75523 17.8519 3.85588 17.6091C3.95653 17.3663 4.10405 17.1457 4.29 16.96L4.35 16.9C4.58054 16.6643 4.73519 16.365 4.794 16.0406C4.85282 15.7162 4.81312 15.3816 4.68 15.08C4.55324 14.7842 4.34276 14.532 4.07447 14.3543C3.80618 14.1766 3.49179 14.0813 3.17 14.08H3C2.46957 14.08 1.96086 13.8693 1.58579 13.4942C1.21071 13.1191 1 12.6104 1 12.08C1 11.5496 1.21071 11.0409 1.58579 10.6658C1.96086 10.2907 2.46957 10.08 3 10.08H3.09C3.42099 10.0723 3.742 9.96512 4.0113 9.77251C4.28059 9.5799 4.48572 9.31074 4.6 9C4.73312 8.69838 4.77282 8.36381 4.714 8.03941C4.65519 7.71502 4.50054 7.41568 4.27 7.18L4.21 7.12C4.02405 6.93425 3.87653 6.71368 3.77588 6.47088C3.67523 6.22808 3.62343 5.96783 3.62343 5.705C3.62343 5.44217 3.67523 5.18192 3.77588 4.93912C3.87653 4.69632 4.02405 4.47575 4.21 4.29C4.39575 4.10405 4.61632 3.95653 4.85912 3.85588C5.10192 3.75523 5.36217 3.70343 5.625 3.70343C5.88783 3.70343 6.14808 3.75523 6.39088 3.85588C6.63368 3.95653 6.85425 4.10405 7.04 4.29L7.1 4.35C7.33568 4.58054 7.63502 4.73519 7.95941 4.794C8.28381 4.85282 8.61838 4.81312 8.92 4.68H9C9.29577 4.55324 9.54802 4.34276 9.72569 4.07447C9.90337 3.80618 9.99872 3.49179 10 3.17V3C10 2.46957 10.2107 1.96086 10.5858 1.58579C10.9609 1.21071 11.4696 1 12 1C12.5304 1 13.0391 1.21071 13.4142 1.58579C13.7893 1.96086 14 2.46957 14 3V3.09C14.0013 3.41179 14.0966 3.72618 14.2743 3.99447C14.452 4.26276 14.7042 4.47324 15 4.6C15.3016 4.73312 15.6362 4.77282 15.9606 4.714C16.285 4.65519 16.5843 4.50054 16.82 4.27L16.88 4.21C17.0657 4.02405 17.2863 3.87653 17.5291 3.77588C17.7719 3.67523 18.0322 3.62343 18.295 3.62343C18.5578 3.62343 18.8181 3.67523 19.0609 3.77588C19.3037 3.87653 19.5243 4.02405 19.71 4.21C19.896 4.39575 20.0435 4.61632 20.1441 4.85912C20.2448 5.10192 20.2966 5.36217 20.2966 5.625C20.2966 5.88783 20.2448 6.14808 20.1441 6.39088C20.0435 6.63368 19.896 6.85425 19.71 7.04L19.65 7.1C19.4195 7.33568 19.2648 7.63502 19.206 7.95941C19.1472 8.28381 19.1869 8.61838 19.32 8.92V9C19.4468 9.29577 19.6572 9.54802 19.9255 9.72569C20.1938 9.90337 20.5082 9.99872 20.83 10H21C21.5304 10 22.0391 10.2107 22.4142 10.5858C22.7893 10.9609 23 11.4696 23 12C23 12.5304 22.7893 13.0391 22.4142 13.4142C22.0391 13.7893 21.5304 14 21 14H20.91C20.5882 14.0013 20.2738 14.0966 20.0055 14.2743C19.7372 14.452 19.5268 14.7042 19.4 15Z"/>
+    </svg>
+  </button>
+
+  <!-- Settings Popup -->
+  <div class="settings-popup" id="settingsPopup">
+    <div class="settings-section">
+      <div class="settings-label">Font</div>
+      <div class="settings-options">
+        <button class="settings-option active" data-font="baskerville" style="font-family: 'Baskerville', 'Georgia', serif;">Baskerville</button>
+        <button class="settings-option" data-font="helvetica" style="font-family: 'Helvetica Neue', 'Helvetica', sans-serif;">Helvetica</button>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">Size</div>
+      <div class="settings-options">
+        <button class="settings-option" data-size="small">S</button>
+        <button class="settings-option active" data-size="medium">M</button>
+        <button class="settings-option" data-size="large">L</button>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-toggle">
+        <span class="settings-toggle-label">Dark Mode</span>
+        <div class="toggle-switch" id="darkModeToggle"></div>
+      </div>
+    </div>
+  </div>
 
   <script>
     const { ipcRenderer } = require('electron');
@@ -591,63 +876,156 @@
     // Elements
     const setupScreen = document.getElementById('setupScreen');
     const writingScreen = document.getElementById('writingScreen');
-    const completeScreen = document.getElementById('completeScreen');
     const titleBar = document.getElementById('titleBar');
 
-    const timeInput = document.getElementById('timeInput');
+    // Tabs
+    const tabNewDraft = document.getElementById('tabNewDraft');
+    const tabOpenDraft = document.getElementById('tabOpenDraft');
+    const contentNewDraft = document.getElementById('contentNewDraft');
+    const contentOpenDraft = document.getElementById('contentOpenDraft');
+
+    // New Draft elements
+    const blockValue = document.getElementById('blockValue');
+    const blockModeRadios = document.querySelectorAll('input[name="blockMode"]');
     const startBtn = document.getElementById('startBtn');
-    const presetBtns = document.querySelectorAll('.preset-btn');
+    const quitBtn = document.getElementById('quitBtn');
 
+    // Open Draft elements
+    const filePathInput = document.getElementById('filePathInput');
+    const chooseFileBtn = document.getElementById('chooseFileBtn');
+    const blockValue2 = document.getElementById('blockValue2');
+    const blockModeRadios2 = document.querySelectorAll('input[name="blockMode2"]');
+    const startBtn2 = document.getElementById('startBtn2');
+    const quitBtn2 = document.getElementById('quitBtn2');
+
+    // Writing screen elements
+    const progressBarContainer = document.getElementById('progressBarContainer');
     const progressFill = document.getElementById('progressFill');
-    const timeRemaining = document.getElementById('timeRemaining');
-    const wordCount = document.getElementById('wordCount');
+    const snoozeOptions = document.getElementById('snoozeOptions');
+    const snoozeBtn = document.getElementById('snoozeBtn');
+    const saveQuitBtn = document.getElementById('saveQuitBtn');
     const editor = document.getElementById('editor');
-    const emergencyBtn = document.getElementById('emergencyBtn');
 
+    // Modal elements
     const emergencyModal = document.getElementById('emergencyModal');
     const emergencyInput = document.getElementById('emergencyInput');
     const modalCancel = document.getElementById('modalCancel');
     const modalConfirm = document.getElementById('modalConfirm');
 
-    const completeStats = document.getElementById('completeStats');
-    const exportBtn = document.getElementById('exportBtn');
-    const newSessionBtn = document.getElementById('newSessionBtn');
-
-    const saveIndicator = document.getElementById('saveIndicator');
 
     // State
+    let sessionMode = 'words'; // 'words', 'time', 'none'
+    let sessionTarget = 0;
     let sessionEndTime = null;
-    let sessionDuration = 0;
     let timerInterval = null;
     let autoSaveInterval = null;
     let lastSavedContent = '';
+    let selectedFilePath = null;
+    let startingWordCount = 0;
+    let sessionEnded = false;
 
-    // Preset buttons
-    presetBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        timeInput.value = btn.dataset.minutes;
-      });
+    // Tab switching
+    tabNewDraft.addEventListener('click', () => {
+      tabNewDraft.classList.add('active');
+      tabOpenDraft.classList.remove('active');
+      contentNewDraft.classList.add('active');
+      contentOpenDraft.classList.remove('active');
     });
 
-    // Start session
+    tabOpenDraft.addEventListener('click', () => {
+      tabOpenDraft.classList.add('active');
+      tabNewDraft.classList.remove('active');
+      contentOpenDraft.classList.add('active');
+      contentNewDraft.classList.remove('active');
+    });
+
+    // Choose file button
+    chooseFileBtn.addEventListener('click', async () => {
+      const result = await ipcRenderer.invoke('choose-file');
+      if (result) {
+        selectedFilePath = result.path;
+        filePathInput.value = result.name;
+        startBtn2.disabled = false;
+      }
+    });
+
+    // Quit buttons
+    quitBtn.addEventListener('click', () => {
+      ipcRenderer.invoke('quit-app');
+    });
+
+    quitBtn2.addEventListener('click', () => {
+      ipcRenderer.invoke('quit-app');
+    });
+
+    // Start session (New Draft)
     startBtn.addEventListener('click', async () => {
-      const minutes = parseInt(timeInput.value);
-      if (minutes < 1 || minutes > 480) {
-        alert('Please enter a time between 1 and 480 minutes.');
+      sessionMode = document.querySelector('input[name="blockMode"]:checked').value;
+      sessionTarget = parseInt(blockValue.value) || 0;
+
+      // Validate input for blocking modes
+      if (sessionMode !== 'none' && sessionTarget <= 0) {
+        blockValue.focus();
+        blockValue.style.borderColor = '#dc3545';
+        setTimeout(() => { blockValue.style.borderColor = ''; }, 2000);
         return;
       }
 
-      sessionDuration = minutes;
+      // Clear editor for new draft
+      editor.value = '';
+      lastSavedContent = '';
+      startingWordCount = 0;
+      selectedFilePath = null;
 
-      // Load any previous content
-      const savedContent = await ipcRenderer.invoke('load-document', 'autosave.txt');
-      editor.value = savedContent;
-      lastSavedContent = savedContent;
-      updateWordCount();
+      await startSession();
+    });
 
-      // Start the session
-      const result = await ipcRenderer.invoke('start-session', minutes);
-      sessionEndTime = result.endTime;
+    // Start session (Open Draft)
+    startBtn2.addEventListener('click', async () => {
+      if (!selectedFilePath) return;
+
+      sessionMode = document.querySelector('input[name="blockMode2"]:checked').value;
+      sessionTarget = parseInt(blockValue2.value) || 0;
+
+      // Validate input for blocking modes
+      if (sessionMode !== 'none' && sessionTarget <= 0) {
+        blockValue2.focus();
+        blockValue2.style.borderColor = '#dc3545';
+        setTimeout(() => { blockValue2.style.borderColor = ''; }, 2000);
+        return;
+      }
+
+      // Load the file content
+      const content = await ipcRenderer.invoke('load-file', selectedFilePath);
+      editor.value = content;
+      lastSavedContent = content;
+      startingWordCount = getWordCount();
+
+      await startSession();
+    });
+
+    async function startSession() {
+      sessionEnded = false;
+      snoozeOptions.classList.remove('active');
+      progressBarContainer.classList.remove('hidden');
+
+      // Start the session based on mode
+      if (sessionMode === 'none') {
+        // No blocking mode - show snooze options immediately
+        progressBarContainer.classList.add('hidden');
+        snoozeOptions.classList.add('active');
+      } else if (sessionMode === 'words') {
+        // Word count mode
+        await ipcRenderer.invoke('start-session-words', sessionTarget);
+        progressFill.style.width = '0%';
+        updateWordProgress();
+      } else {
+        // Time mode
+        const result = await ipcRenderer.invoke('start-session-time', sessionTarget);
+        sessionEndTime = result.endTime;
+        progressFill.style.width = '0%';
+        startTimer();
+      }
 
       // Switch screens
       setupScreen.classList.add('hidden');
@@ -657,14 +1035,11 @@
       // Focus editor
       setTimeout(() => editor.focus(), 100);
 
-      // Start timer
-      startTimer();
-
       // Start auto-save
       startAutoSave();
-    });
+    }
 
-    // Timer
+    // Timer for time-based sessions
     function startTimer() {
       updateTimer();
       timerInterval = setInterval(updateTimer, 1000);
@@ -675,78 +1050,115 @@
       const remaining = Math.max(0, sessionEndTime - now);
 
       if (remaining <= 0) {
-        endSession();
+        showSnoozeOptions();
         return;
       }
 
-      const totalDuration = sessionDuration * 60 * 1000;
+      const totalDuration = sessionTarget * 60 * 1000;
       const elapsed = totalDuration - remaining;
       const progress = (elapsed / totalDuration) * 100;
 
-      progressFill.style.width = `${100 - progress}%`;
-
-      const minutes = Math.floor(remaining / 60000);
-      const seconds = Math.floor((remaining % 60000) / 1000);
-      timeRemaining.textContent = `${minutes}:${seconds.toString().padStart(2, '0')} remaining`;
+      progressFill.style.width = `${progress}%`;
     }
 
-    // Word count
-    function updateWordCount() {
+    // Word count functions
+    function getWordCount() {
       const text = editor.value.trim();
-      const words = text ? text.split(/\s+/).length : 0;
-      wordCount.textContent = `${words} word${words !== 1 ? 's' : ''}`;
+      return text ? text.split(/\s+/).length : 0;
     }
 
-    editor.addEventListener('input', updateWordCount);
 
-    // Auto-save
-    function startAutoSave() {
-      autoSaveInterval = setInterval(async () => {
-        if (editor.value !== lastSavedContent) {
-          saveIndicator.textContent = 'Saving...';
-          saveIndicator.classList.remove('saved');
-          saveIndicator.classList.add('visible');
+    function updateWordProgress() {
+      const currentWords = getWordCount();
+      const wordsWritten = currentWords - startingWordCount;
+      const remaining = Math.max(0, sessionTarget - wordsWritten);
 
-          await ipcRenderer.invoke('save-document', editor.value, 'autosave.txt');
-          lastSavedContent = editor.value;
+      if (remaining <= 0 && !sessionEnded) {
+        showSnoozeOptions();
+        return;
+      }
 
-          saveIndicator.textContent = 'Saved';
-          saveIndicator.classList.add('saved');
-
-          setTimeout(() => {
-            saveIndicator.classList.remove('visible');
-          }, 1500);
-        }
-      }, 3000);
+      const progress = Math.min(100, (wordsWritten / sessionTarget) * 100);
+      progressFill.style.width = `${progress}%`;
     }
 
-    // End session
-    async function endSession() {
+    editor.addEventListener('input', () => {
+      if (sessionMode === 'words' && !sessionEnded) {
+        updateWordProgress();
+      }
+    });
+
+    // Show snooze options when session ends
+    function showSnoozeOptions() {
+      sessionEnded = true;
+      clearInterval(timerInterval);
+
+      // End the lock
+      ipcRenderer.invoke('end-session');
+
+      // Fade out progress bar, fade in snooze options
+      progressBarContainer.classList.add('hidden');
+      snoozeOptions.classList.add('active');
+    }
+
+    // Snooze - add 10 more minutes
+    snoozeBtn.addEventListener('click', async () => {
+      sessionEnded = false;
+      snoozeOptions.classList.remove('active');
+      progressBarContainer.classList.remove('hidden');
+
+      // Start a 10-minute session
+      sessionMode = 'time';
+      sessionTarget = 10;
+      const result = await ipcRenderer.invoke('start-session-time', 10);
+      sessionEndTime = result.endTime;
+      progressFill.style.width = '0%';
+      startTimer();
+
+      editor.focus();
+    });
+
+    // Save and Quit
+    saveQuitBtn.addEventListener('click', async () => {
       clearInterval(timerInterval);
       clearInterval(autoSaveInterval);
 
       // Final save
       await ipcRenderer.invoke('save-document', editor.value, 'autosave.txt');
 
-      // End the lock
+      // Prompt to export
+      await ipcRenderer.invoke('export-document', editor.value);
+
+      // End and quit
       await ipcRenderer.invoke('end-session');
+      await ipcRenderer.invoke('quit-app');
+    });
 
-      // Calculate stats
-      const text = editor.value.trim();
-      const words = text ? text.split(/\s+/).length : 0;
-      completeStats.textContent = `You wrote ${words} word${words !== 1 ? 's' : ''} in ${sessionDuration} minutes.`;
-
-      // Switch screens
-      writingScreen.classList.remove('active');
-      completeScreen.classList.add('active');
-      titleBar.style.display = 'flex';
+    // Auto-save (silently, only replaces current session)
+    function startAutoSave() {
+      autoSaveInterval = setInterval(async () => {
+        if (editor.value !== lastSavedContent) {
+          await ipcRenderer.invoke('save-document', editor.value, 'autosave.txt');
+          lastSavedContent = editor.value;
+        }
+      }, 3000);
     }
 
-    // Emergency exit
-    emergencyBtn.addEventListener('click', () => {
-      emergencyModal.classList.add('active');
-      emergencyInput.value = '';
-      emergencyInput.focus();
+    // Emergency exit (keyboard shortcut could trigger this)
+    document.addEventListener('keydown', (e) => {
+      // Cmd+Shift+E for emergency exit
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'e') {
+        if (writingScreen.classList.contains('active') && !sessionEnded && sessionMode !== 'none') {
+          emergencyModal.classList.add('active');
+          emergencyInput.value = '';
+          emergencyInput.focus();
+        }
+      }
+
+      // Prevent Cmd+W, Cmd+Q, etc.
+      if ((e.metaKey || e.ctrlKey) && ['w', 'q', 'n', 'h'].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+      }
     });
 
     modalCancel.addEventListener('click', () => {
@@ -758,7 +1170,7 @@
       const result = await ipcRenderer.invoke('emergency-exit', emergencyInput.value);
       if (result) {
         emergencyModal.classList.remove('active');
-        endSession();
+        showSnoozeOptions();
       } else {
         emergencyInput.value = '';
         emergencyInput.placeholder = 'Phrase does not match. Try again...';
@@ -772,44 +1184,76 @@
       }
     });
 
-    // Export
-    exportBtn.addEventListener('click', async () => {
-      await ipcRenderer.invoke('export-document', editor.value);
-    });
-
-    // New session
-    newSessionBtn.addEventListener('click', () => {
-      completeScreen.classList.remove('active');
-      setupScreen.classList.remove('hidden');
-      timeInput.focus();
-    });
-
     // Handle close attempts
     ipcRenderer.on('close-attempted', () => {
-      // Flash the progress bar or show warning
-      progressFill.style.background = 'linear-gradient(90deg, #ff4757, #ff6b7a)';
+      progressFill.style.background = '#dc3545';
       setTimeout(() => {
-        progressFill.style.background = 'linear-gradient(90deg, var(--accent), #6dd5ed)';
+        progressFill.style.background = '';
       }, 500);
     });
 
-    // Prevent some keyboard shortcuts in renderer
-    document.addEventListener('keydown', (e) => {
-      // Prevent Cmd+W, Cmd+Q, etc.
-      if ((e.metaKey || e.ctrlKey) && ['w', 'q', 'n', 'h'].includes(e.key.toLowerCase())) {
-        e.preventDefault();
-      }
-    });
-
-    // Disable context menu
+    // Disable context menu during locked writing
     document.addEventListener('contextmenu', (e) => {
-      if (writingScreen.classList.contains('active')) {
+      if (writingScreen.classList.contains('active') && !sessionEnded && sessionMode !== 'none') {
         e.preventDefault();
       }
     });
 
-    // Initial focus
-    timeInput.focus();
+    // Settings functionality
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsPopup = document.getElementById('settingsPopup');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const fontOptions = document.querySelectorAll('[data-font]');
+    const sizeOptions = document.querySelectorAll('[data-size]');
+
+    // Toggle settings popup
+    settingsBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      settingsPopup.classList.toggle('active');
+    });
+
+    // Close popup when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!settingsPopup.contains(e.target) && e.target !== settingsBtn) {
+        settingsPopup.classList.remove('active');
+      }
+    });
+
+    // Font family options
+    fontOptions.forEach(btn => {
+      btn.addEventListener('click', () => {
+        fontOptions.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const font = btn.dataset.font;
+        if (font === 'baskerville') {
+          document.documentElement.style.setProperty('--editor-font', "'Baskerville', 'Georgia', serif");
+        } else if (font === 'helvetica') {
+          document.documentElement.style.setProperty('--editor-font', "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif");
+        }
+      });
+    });
+
+    // Font size options
+    sizeOptions.forEach(btn => {
+      btn.addEventListener('click', () => {
+        sizeOptions.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const size = btn.dataset.size;
+        if (size === 'small') {
+          document.documentElement.style.setProperty('--editor-font-size', '16px');
+        } else if (size === 'medium') {
+          document.documentElement.style.setProperty('--editor-font-size', '20px');
+        } else if (size === 'large') {
+          document.documentElement.style.setProperty('--editor-font-size', '24px');
+        }
+      });
+    });
+
+    // Dark mode toggle
+    darkModeToggle.addEventListener('click', () => {
+      darkModeToggle.classList.toggle('active');
+      document.body.classList.toggle('dark-mode');
+    });
   </script>
 </body>
 </html>

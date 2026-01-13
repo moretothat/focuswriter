@@ -1,11 +1,13 @@
 const { app, BrowserWindow, ipcMain, globalShortcut, dialog, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
 let mainWindow;
 let isLocked = false;
 let lockEndTime = null;
 let preventCloseUntil = null;
+let sessionMode = 'none'; // 'words', 'time', 'none'
 
 // Disable hardware acceleration issues
 app.disableHardwareAcceleration();
@@ -16,10 +18,8 @@ if (!gotTheLock) {
   app.quit();
 }
 
-// Get user data path for saving documents
-const userDataPath = app.getPath('userData');
-const documentsPath = path.join(userDataPath, 'documents');
-const settingsPath = path.join(userDataPath, 'settings.json');
+// Auto-save location: ~/Documents/auto_save_document
+const documentsPath = path.join(os.homedir(), 'Documents', 'auto_save_document');
 
 // Ensure documents directory exists
 if (!fs.existsSync(documentsPath)) {
@@ -35,27 +35,28 @@ function createWindow() {
     height: 800,
     minWidth: 800,
     minHeight: 600,
-    backgroundColor: '#1a1a2e',
-    titleBarStyle: 'hidden',
-    frame: false,
+    backgroundColor: '#f0f2f5', // Light mode background
+    titleBarStyle: 'hiddenInset',
+    fullscreen: true, // Start in fullscreen
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true
     },
-    show: false
+    show: true
   });
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
-  // Show window when ready
+  // Show window in fullscreen when ready
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
+    mainWindow.setFullScreen(true);
   });
 
   // Prevent closing during lock
   mainWindow.on('close', (e) => {
-    if (isLocked && Date.now() < preventCloseUntil) {
+    if (isLocked && preventCloseUntil && Date.now() < preventCloseUntil) {
       e.preventDefault();
       mainWindow.webContents.send('close-attempted');
       return false;
@@ -112,7 +113,7 @@ function registerBlockingShortcuts() {
     // Do nothing during lock
   });
 
-  // Block Cmd+Tab (App Switcher) - Note: This may not work on all systems
+  // Block Cmd+Tab (App Switcher)
   globalShortcut.register('CommandOrControl+Tab', () => {
     if (isLocked) {
       mainWindow.focus();
@@ -134,36 +135,67 @@ function unregisterBlockingShortcuts() {
   globalShortcut.unregisterAll();
 }
 
-// IPC handlers
-ipcMain.handle('start-session', async (event, minutes) => {
+function enterLockMode() {
   isLocked = true;
-  const duration = minutes * 60 * 1000;
-  lockEndTime = Date.now() + duration;
-  preventCloseUntil = lockEndTime;
-
-  // Enter kiosk mode (true fullscreen that hides dock/menu)
   mainWindow.setKiosk(true);
   mainWindow.setAlwaysOnTop(true, 'screen-saver');
   mainWindow.setVisibleOnAllWorkspaces(true);
   mainWindow.focus();
-
   registerBlockingShortcuts();
+}
+
+function exitLockMode() {
+  isLocked = false;
+  lockEndTime = null;
+  preventCloseUntil = null;
+  sessionMode = 'none';
+  unregisterBlockingShortcuts();
+  // Keep kiosk/fullscreen mode - only disable blocking features
+  mainWindow.setAlwaysOnTop(false);
+  mainWindow.setVisibleOnAllWorkspaces(false);
+  // Stay fullscreen until user clicks Save and Quit
+}
+
+function exitFullscreen() {
+  mainWindow.setKiosk(false);
+  mainWindow.setFullScreen(false);
+}
+
+// IPC handlers
+
+// Start session with word count goal
+ipcMain.handle('start-session-words', async (event, wordTarget) => {
+  sessionMode = 'words';
+  // For word-based sessions, we set a very long timeout (24 hours)
+  // The session ends when the word count is reached (handled in renderer)
+  const duration = 24 * 60 * 60 * 1000; // 24 hours max
+  lockEndTime = Date.now() + duration;
+  preventCloseUntil = lockEndTime;
+
+  enterLockMode();
+
+  return { wordTarget };
+});
+
+// Start session with time limit
+ipcMain.handle('start-session-time', async (event, minutes) => {
+  sessionMode = 'time';
+  const duration = minutes * 60 * 1000;
+  lockEndTime = Date.now() + duration;
+  preventCloseUntil = lockEndTime;
+
+  enterLockMode();
 
   return { endTime: lockEndTime };
 });
 
+// Legacy handler for backwards compatibility
+ipcMain.handle('start-session', async (event, minutes) => {
+  return ipcMain.handle('start-session-time', event, minutes);
+});
+
 ipcMain.handle('end-session', async () => {
-  isLocked = false;
-  lockEndTime = null;
-  preventCloseUntil = null;
-
-  unregisterBlockingShortcuts();
-
-  mainWindow.setKiosk(false);
-  mainWindow.setAlwaysOnTop(false);
-  mainWindow.setVisibleOnAllWorkspaces(false);
-  mainWindow.setFullScreen(false);
-
+  exitLockMode();
   return true;
 });
 
@@ -171,7 +203,8 @@ ipcMain.handle('get-lock-status', async () => {
   return {
     isLocked,
     endTime: lockEndTime,
-    remaining: lockEndTime ? Math.max(0, lockEndTime - Date.now()) : 0
+    remaining: lockEndTime ? Math.max(0, lockEndTime - Date.now()) : 0,
+    sessionMode
   };
 });
 
@@ -189,9 +222,76 @@ ipcMain.handle('load-document', async (event, filename) => {
   return '';
 });
 
+// Get list of saved drafts
+ipcMain.handle('get-drafts', async () => {
+  const drafts = [];
+
+  if (fs.existsSync(documentsPath)) {
+    const files = fs.readdirSync(documentsPath);
+
+    for (const file of files) {
+      if (file.endsWith('.txt')) {
+        const filePath = path.join(documentsPath, file);
+        const stats = fs.statSync(filePath);
+        const content = fs.readFileSync(filePath, 'utf8');
+
+        // Get first line or first 30 chars as name
+        const firstLine = content.split('\n')[0] || 'Untitled';
+        const name = firstLine.substring(0, 40) + (firstLine.length > 40 ? '...' : '');
+
+        drafts.push({
+          filename: file,
+          name: name || 'Untitled Draft',
+          date: stats.mtime.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+          }),
+          modified: stats.mtime
+        });
+      }
+    }
+
+    // Sort by most recent
+    drafts.sort((a, b) => b.modified - a.modified);
+  }
+
+  return drafts;
+});
+
+// Choose file dialog for Open Draft
+ipcMain.handle('choose-file', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: 'Open Draft',
+    defaultPath: app.getPath('documents'),
+    filters: [
+      { name: 'Text Files', extensions: ['txt', 'md'] },
+      { name: 'All Files', extensions: ['*'] }
+    ],
+    properties: ['openFile']
+  });
+
+  if (!result.canceled && result.filePaths.length > 0) {
+    const filePath = result.filePaths[0];
+    return {
+      path: filePath,
+      name: path.basename(filePath)
+    };
+  }
+  return null;
+});
+
+// Load file from any path
+ipcMain.handle('load-file', async (event, filePath) => {
+  if (fs.existsSync(filePath)) {
+    return fs.readFileSync(filePath, 'utf8');
+  }
+  return '';
+});
+
 ipcMain.handle('export-document', async (event, content) => {
   const result = await dialog.showSaveDialog(mainWindow, {
-    title: 'Export Document',
+    title: 'Save Document',
     defaultPath: path.join(app.getPath('documents'), 'focuswriter-export.txt'),
     filters: [
       { name: 'Text Files', extensions: ['txt'] },
@@ -211,17 +311,21 @@ ipcMain.handle('get-documents-path', async () => {
   return documentsPath;
 });
 
+ipcMain.handle('quit-app', async () => {
+  exitFullscreen();
+  app.quit();
+});
+
+ipcMain.handle('exit-fullscreen', async () => {
+  exitFullscreen();
+  return true;
+});
+
 ipcMain.handle('emergency-exit', async (event, phrase) => {
   // Require typing a long phrase to exit early
   const requiredPhrase = "I understand this defeats the purpose of focused writing";
   if (phrase === requiredPhrase) {
-    isLocked = false;
-    lockEndTime = null;
-    preventCloseUntil = null;
-    unregisterBlockingShortcuts();
-    mainWindow.setKiosk(false);
-    mainWindow.setAlwaysOnTop(false);
-    mainWindow.setVisibleOnAllWorkspaces(false);
+    exitLockMode();
     return true;
   }
   return false;
