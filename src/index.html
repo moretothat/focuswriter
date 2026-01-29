@@ -673,6 +673,23 @@
       left: 22px;
     }
 
+    /* Selection Word Count */
+    .selection-count {
+      position: fixed;
+      bottom: 20px;
+      left: 70px;
+      font-size: 13px;
+      color: var(--text-muted);
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .selection-count.visible {
+      opacity: 1;
+    }
+
     /* Dark Mode */
     body.dark-mode {
       --bg-primary: #1a1a2e;
@@ -836,6 +853,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Selection Word Count -->
+  <div class="selection-count" id="selectionCount"></div>
 
   <!-- Settings Button -->
   <button class="settings-btn" id="settingsBtn">
@@ -1067,6 +1087,30 @@
       return text ? text.split(/\s+/).length : 0;
     }
 
+    // Selection word count
+    const selectionCount = document.getElementById('selectionCount');
+
+    function getSelectionWordCount() {
+      const start = editor.selectionStart;
+      const end = editor.selectionEnd;
+      if (start === end) return 0;
+      const selectedText = editor.value.substring(start, end).trim();
+      return selectedText ? selectedText.split(/\s+/).length : 0;
+    }
+
+    function updateSelectionCount() {
+      const count = getSelectionWordCount();
+      if (count >= 5) {
+        selectionCount.textContent = `${count} words selected`;
+        selectionCount.classList.add('visible');
+      } else {
+        selectionCount.classList.remove('visible');
+      }
+    }
+
+    editor.addEventListener('mouseup', updateSelectionCount);
+    editor.addEventListener('keyup', updateSelectionCount);
+    editor.addEventListener('select', updateSelectionCount);
 
     function updateWordProgress() {
       const currentWords = getWordCount();
