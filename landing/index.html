@@ -8,6 +8,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+  <script>
+    // Apply saved theme before paint to avoid flash
+    (function() {
+      try {
+        const saved = localStorage.getItem('focuswriter:theme');
+        if (saved === 'light' || saved === 'dark') {
+          document.documentElement.setAttribute('data-theme', saved);
+        }
+      } catch (e) {}
+    })();
+  </script>
   <style>
     :root {
       --bg: #faf7f0;
@@ -43,6 +54,38 @@
         --highlight: #3d3a1c;
         --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
       }
+    }
+
+    html[data-theme="dark"] {
+      --bg: #11161e;
+      --paper: #161c26;
+      --ink: #e8eef5;
+      --ink-soft: #aab4c2;
+      --ink-muted: #7c8696;
+      --rule: #232b38;
+      --rule-soft: #1c232e;
+      --blue: #6cb1e6;
+      --blue-soft: #4f9bd6;
+      --cyan: #02a5d2;
+      --pale: #1f2d3d;
+      --highlight: #3d3a1c;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    html[data-theme="light"] {
+      --bg: #faf7f0;
+      --paper: #fffdf7;
+      --ink: #1a2332;
+      --ink-soft: #4a5568;
+      --ink-muted: #8a96a8;
+      --rule: #e3dfd2;
+      --rule-soft: #efebde;
+      --blue: #0b3f6a;
+      --blue-soft: #2674b5;
+      --cyan: #02a5d2;
+      --pale: #e5f2f9;
+      --highlight: #FEF5C4;
+      --shadow: 0 1px 2px rgba(11, 63, 106, 0.04), 0 8px 24px rgba(11, 63, 106, 0.06);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -104,6 +147,43 @@
       text-decoration: none;
     }
     .header-link:hover { color: var(--ink-soft); text-decoration: none; }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .theme-toggle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--rule);
+      background: var(--paper);
+      color: var(--ink-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      box-shadow: var(--shadow);
+      padding: 0;
+    }
+    .theme-toggle:hover {
+      border-color: var(--blue-soft);
+      color: var(--ink);
+    }
+    .theme-toggle svg {
+      width: 16px;
+      height: 16px;
+    }
+    .theme-toggle .icon-sun { display: none; }
+    .theme-toggle .icon-moon { display: block; }
+    html[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+    html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+    @media (prefers-color-scheme: dark) {
+      html:not([data-theme="light"]) .theme-toggle .icon-sun { display: block; }
+      html:not([data-theme="light"]) .theme-toggle .icon-moon { display: none; }
+    }
 
     .setup-main {
       width: 100%;
@@ -560,7 +640,25 @@
         <div class="wordmark-dot"></div>
         FocusWriter
       </div>
-      <a href="#about" class="header-link" id="about-link">About</a>
+      <div class="header-actions">
+        <a href="#about" class="header-link" id="about-link">About</a>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" title="Toggle light/dark mode">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/>
+            <line x1="12" y1="2" x2="12" y2="5"/>
+            <line x1="12" y1="19" x2="12" y2="22"/>
+            <line x1="2" y1="12" x2="5" y2="12"/>
+            <line x1="19" y1="12" x2="22" y2="12"/>
+            <line x1="4.93" y1="4.93" x2="7.05" y2="7.05"/>
+            <line x1="16.95" y1="16.95" x2="19.07" y2="19.07"/>
+            <line x1="4.93" y1="19.07" x2="7.05" y2="16.95"/>
+            <line x1="16.95" y1="7.05" x2="19.07" y2="4.93"/>
+          </svg>
+        </button>
+      </div>
     </header>
 
     <div id="resume-banner-slot"></div>
@@ -598,7 +696,7 @@
     <footer class="setup-foot">
       Auto-saves to your browser. Your writing never leaves this device.
       <br>
-      Made by <a href="https://moretothat.com">More to That</a>.
+      Made by <a href="https://lawrenceyeo.com">Lawrence Yeo</a>.
     </footer>
   </main>
 
@@ -959,6 +1057,19 @@
         .slice(0, 40) || 'session';
       return `focuswriter-${date}-${slug}.txt`;
     }
+
+    // ============ THEME ============
+    const themeToggle = document.getElementById('theme-toggle');
+    function currentTheme() {
+      const explicit = document.documentElement.getAttribute('data-theme');
+      if (explicit) return explicit;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    themeToggle.addEventListener('click', () => {
+      const next = currentTheme() === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('focuswriter:theme', next); } catch (e) {}
+    });
 
     // ============ INIT ============
     loadSettings();
