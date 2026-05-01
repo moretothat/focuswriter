@@ -3,1385 +3,981 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FocusWriter - Lock In. Write.</title>
+  <title>FocusWriter — A calm space for focused writing</title>
+  <meta name="description" content="A calm, fullscreen writing space with a timer. No accounts. No distractions. Just write.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-primary: #0a0a0b;
-      --bg-secondary: #111113;
-      --bg-tertiary: #18181b;
-      --bg-card: #1a1a1d;
-      --text-primary: #fafafa;
-      --text-secondary: #a1a1aa;
-      --text-muted: #71717a;
-      --accent-cyan: #22d3ee;
-      --accent-purple: #a78bfa;
-      --accent-blue: #3b82f6;
-      --accent-green: #4ade80;
-      --accent-orange: #fb923c;
-      --border-color: #27272a;
-      --gradient-1: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #d946ef 100%);
-      --gradient-2: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
+      --bg: #faf7f0;
+      --paper: #fffdf7;
+      --ink: #1a2332;
+      --ink-soft: #4a5568;
+      --ink-muted: #8a96a8;
+      --rule: #e3dfd2;
+      --rule-soft: #efebde;
+      --blue: #0b3f6a;
+      --blue-soft: #2674b5;
+      --cyan: #02a5d2;
+      --pale: #e5f2f9;
+      --highlight: #FEF5C4;
+      --shadow: 0 1px 2px rgba(11, 63, 106, 0.04), 0 8px 24px rgba(11, 63, 106, 0.06);
+      --serif: 'Source Serif 4', 'Iowan Old Style', 'Charter', 'Georgia', serif;
+      --sans: 'Helvetica Neue', 'Avenir Next', Avenir, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #11161e;
+        --paper: #161c26;
+        --ink: #e8eef5;
+        --ink-soft: #aab4c2;
+        --ink-muted: #7c8696;
+        --rule: #232b38;
+        --rule-soft: #1c232e;
+        --blue: #6cb1e6;
+        --blue-soft: #4f9bd6;
+        --cyan: #02a5d2;
+        --pale: #1f2d3d;
+        --highlight: #3d3a1c;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+      }
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
       font-size: 16px;
-      line-height: 1.6;
-      color: var(--text-primary);
-      background-color: var(--bg-primary);
-      overflow-x: hidden;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Animations */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+    button { font-family: inherit; font-size: inherit; cursor: pointer; }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    @keyframes typing {
-      from { width: 0; }
-      to { width: 100%; }
-    }
-
-    @keyframes blink {
-      50% { border-color: transparent; }
-    }
-
-    .animate-on-scroll {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-
-    .animate-on-scroll.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* Navigation */
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      padding: 16px 24px;
-      background: rgba(10, 10, 11, 0.8);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .nav-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text-primary);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .logo-icon {
-      width: 28px;
-      height: 28px;
-      background: var(--gradient-2);
-      border-radius: 6px;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 32px;
-      list-style: none;
-    }
-
-    .nav-links a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover {
-      color: var(--text-primary);
-    }
-
-    .nav-cta {
-      background: var(--text-primary);
-      color: var(--bg-primary);
-      padding: 10px 20px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 600;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .nav-cta:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
-    }
-
-    .nav-buttons {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .nav-link-btn {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      padding: 10px 16px;
-      transition: color 0.2s;
-    }
-
-    .nav-link-btn:hover {
-      color: var(--text-primary);
-    }
-
-    .nav-user {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .nav-user-name {
-      color: var(--text-secondary);
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    /* Hero Section */
-    .hero {
+    /* ============ SETUP VIEW ============ */
+    .setup {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      padding: 120px 24px 80px;
-      position: relative;
-      overflow: hidden;
+      padding: 48px 24px 64px;
     }
 
-    .hero-bg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(ellipse at 50% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-                  radial-gradient(ellipse at 80% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 40%),
-                  radial-gradient(ellipse at 20% 80%, rgba(34, 211, 238, 0.08) 0%, transparent 40%);
-      pointer-events: none;
-    }
-
-    .hero-content {
-      text-align: center;
-      max-width: 900px;
-      position: relative;
-      z-index: 1;
-      animation: fadeInUp 0.8s ease;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      padding: 8px 16px;
-      border-radius: 100px;
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-bottom: 32px;
-    }
-
-    .hero-badge-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--accent-green);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    .hero h1 {
-      font-size: clamp(48px, 8vw, 80px);
-      font-weight: 800;
-      line-height: 1.05;
-      letter-spacing: -0.03em;
-      margin-bottom: 24px;
-      background: linear-gradient(180deg, #fff 0%, #a1a1aa 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero-subtitle {
-      font-size: clamp(18px, 2.5vw, 22px);
-      color: var(--text-secondary);
-      max-width: 600px;
-      margin: 0 auto 40px;
-      line-height: 1.6;
-    }
-
-    .hero-buttons {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--text-primary);
-      color: var(--bg-primary);
-      padding: 14px 28px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-size: 15px;
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(255, 255, 255, 0.2);
-    }
-
-    .btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: transparent;
-      color: var(--text-primary);
-      padding: 14px 28px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-size: 15px;
-      font-weight: 600;
-      border: 1px solid var(--border-color);
-      transition: all 0.2s;
-    }
-
-    .btn-secondary:hover {
-      background: var(--bg-tertiary);
-      border-color: var(--text-muted);
-    }
-
-    .hero-note {
-      margin-top: 20px;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    /* App Preview */
-    .app-preview {
-      margin-top: 80px;
+    .setup-header {
       width: 100%;
-      max-width: 1000px;
-      position: relative;
-      animation: fadeInUp 0.8s ease 0.2s both;
-    }
-
-    .app-window {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 25px 100px -20px rgba(0, 0, 0, 0.5),
-                  0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-    }
-
-    .app-titlebar {
-      display: flex;
-      align-items: center;
-      padding: 16px 20px;
-      background: var(--bg-tertiary);
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .window-controls {
-      display: flex;
-      gap: 8px;
-    }
-
-    .window-control {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
-
-    .window-control.close { background: #ff5f57; }
-    .window-control.minimize { background: #febc2e; }
-    .window-control.maximize { background: #28c840; }
-
-    .app-titlebar-text {
-      flex: 1;
-      text-align: center;
-      font-size: 13px;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    .app-content {
-      padding: 60px;
-      min-height: 400px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    .app-timer {
-      font-size: 14px;
-      color: var(--accent-cyan);
-      font-family: 'JetBrains Mono', monospace;
-      margin-bottom: 40px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .timer-bar {
-      width: 200px;
-      height: 4px;
-      background: var(--bg-tertiary);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-
-    .timer-progress {
-      width: 65%;
-      height: 100%;
-      background: var(--gradient-2);
-      border-radius: 2px;
-    }
-
-    .app-editor {
-      width: 100%;
-      max-width: 700px;
-      text-align: left;
-    }
-
-    .editor-line {
-      font-size: 20px;
-      line-height: 1.8;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
-
-    .editor-cursor {
-      display: inline-block;
-      width: 2px;
-      height: 24px;
-      background: var(--accent-cyan);
-      margin-left: 2px;
-      animation: blink 1s infinite;
-      vertical-align: middle;
-    }
-
-    .app-stats {
-      position: absolute;
-      bottom: 20px;
-      right: 24px;
-      font-size: 12px;
-      color: var(--text-muted);
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .app-glow {
-      position: absolute;
-      bottom: -50%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80%;
-      height: 300px;
-      background: radial-gradient(ellipse, rgba(34, 211, 238, 0.15) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    /* Problem Section */
-    .problem {
-      padding: 120px 24px;
-      position: relative;
-    }
-
-    .problem-container {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .section-label {
-      display: inline-block;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--accent-cyan);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 16px;
-    }
-
-    .problem h2 {
-      font-size: clamp(32px, 5vw, 48px);
-      font-weight: 700;
-      line-height: 1.2;
-      letter-spacing: -0.02em;
-      margin-bottom: 40px;
-    }
-
-    .problem-text {
-      font-size: 18px;
-      color: var(--text-secondary);
-      line-height: 1.8;
-      margin-bottom: 24px;
-    }
-
-    .problem-highlight {
-      color: var(--text-primary);
-      font-weight: 500;
-    }
-
-    /* Features Section */
-    .features {
-      padding: 120px 24px;
-      background: var(--bg-secondary);
-    }
-
-    .features-container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .features-header {
-      text-align: center;
-      margin-bottom: 80px;
-    }
-
-    .features h2 {
-      font-size: clamp(32px, 5vw, 48px);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-    }
-
-    @media (max-width: 900px) {
-      .features-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 600px) {
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .feature-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 32px;
-      transition: all 0.3s ease;
-    }
-
-    .feature-card:hover {
-      border-color: var(--text-muted);
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    }
-
-    .feature-icon {
-      width: 48px;
-      height: 48px;
-      background: var(--bg-tertiary);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-      font-size: 24px;
-    }
-
-    .feature-card h3 {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 12px;
-    }
-
-    .feature-card p {
-      font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-    }
-
-    /* How It Works */
-    .how-it-works {
-      padding: 120px 24px;
-    }
-
-    .how-container {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .how-header {
-      text-align: center;
-      margin-bottom: 80px;
-    }
-
-    .how-header h2 {
-      font-size: clamp(32px, 5vw, 48px);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-
-    .steps-container {
-      display: flex;
-      flex-direction: column;
-      gap: 80px;
-    }
-
-    .step {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: center;
-    }
-
-    .step:nth-child(even) {
-      direction: rtl;
-    }
-
-    .step:nth-child(even) > * {
-      direction: ltr;
-    }
-
-    .step-content {
-      padding: 20px 0;
-    }
-
-    .step-number {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      background: var(--gradient-2);
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 700;
-      margin-bottom: 20px;
-    }
-
-    .step-content h3 {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      letter-spacing: -0.01em;
-    }
-
-    .step-content p {
-      font-size: 16px;
-      color: var(--text-secondary);
-      line-height: 1.7;
-    }
-
-    .step-visual {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 280px;
-    }
-
-    .step-mockup {
-      width: 100%;
-    }
-
-    /* Commitment Selector Mockup */
-    .commitment-mockup {
-      text-align: center;
-    }
-
-    .commitment-title {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-bottom: 24px;
-    }
-
-    .commitment-options {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .commitment-option {
-      padding: 16px 24px;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      font-size: 14px;
-      color: var(--text-secondary);
-      transition: all 0.2s;
-    }
-
-    .commitment-option.active {
-      background: var(--accent-cyan);
-      color: var(--bg-primary);
-      border-color: var(--accent-cyan);
-      font-weight: 600;
-    }
-
-    /* Locked Screen Mockup */
-    .locked-mockup {
-      position: relative;
-      width: 100%;
-      height: 200px;
-      background: var(--bg-primary);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .locked-overlay {
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 10px,
-        rgba(255,255,255,0.02) 10px,
-        rgba(255,255,255,0.02) 20px
-      );
-    }
-
-    .locked-icon {
-      font-size: 48px;
-      color: var(--accent-purple);
-    }
-
-    .locked-text {
-      position: absolute;
-      bottom: 16px;
-      font-size: 11px;
-      color: var(--text-muted);
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    /* Writing Mockup */
-    .writing-mockup {
-      text-align: left;
-      font-family: Georgia, serif;
-      font-size: 16px;
-      line-height: 1.9;
-      color: var(--text-secondary);
-    }
-
-    .writing-mockup .typed {
-      color: var(--text-primary);
-    }
-
-    /* Export Mockup */
-    .export-mockup {
-      text-align: center;
-    }
-
-    .export-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-    }
-
-    .export-text {
-      font-size: 14px;
-      color: var(--text-muted);
-    }
-
-    .export-filename {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      color: var(--accent-green);
-      margin-top: 8px;
-    }
-
-    @media (max-width: 768px) {
-      .step {
-        grid-template-columns: 1fr;
-        gap: 32px;
-      }
-
-      .step:nth-child(even) {
-        direction: ltr;
-      }
-    }
-
-    /* Social Proof */
-    .social-proof {
-      padding: 80px 24px;
-      background: var(--bg-secondary);
-      border-top: 1px solid var(--border-color);
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .social-container {
-      max-width: 800px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .testimonial {
-      margin-bottom: 32px;
-    }
-
-    .testimonial-quote {
-      font-size: clamp(20px, 3vw, 28px);
-      font-weight: 500;
-      line-height: 1.5;
-      margin-bottom: 24px;
-      font-style: italic;
-    }
-
-    .testimonial-author {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-    }
-
-    .author-avatar {
-      width: 48px;
-      height: 48px;
-      background: var(--gradient-1);
-      border-radius: 50%;
-    }
-
-    .author-info {
-      text-align: left;
-    }
-
-    .author-name {
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    .author-title {
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    /* Download Section */
-    .download {
-      padding: 120px 24px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .download-bg {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 50% 100%, rgba(34, 211, 238, 0.1) 0%, transparent 50%);
-      pointer-events: none;
-    }
-
-    .download-container {
-      max-width: 700px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-    }
-
-    .download h2 {
-      font-size: clamp(36px, 6vw, 56px);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      margin-bottom: 20px;
-      background: linear-gradient(180deg, #fff 0%, #a1a1aa 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .download-subtitle {
-      font-size: 18px;
-      color: var(--text-secondary);
-      margin-bottom: 40px;
-    }
-
-    .download-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-bottom: 24px;
-    }
-
-    .download-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px 32px;
-      border-radius: 12px;
-      text-decoration: none;
-      font-size: 16px;
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-
-    .download-btn.mac {
-      background: var(--text-primary);
-      color: var(--bg-primary);
-    }
-
-    .download-btn.mac:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(255, 255, 255, 0.2);
-    }
-
-    .download-btn.windows {
-      background: var(--bg-tertiary);
-      color: var(--text-primary);
-      border: 1px solid var(--border-color);
-    }
-
-    .download-btn.windows:hover {
-      background: var(--bg-card);
-      border-color: var(--text-muted);
-    }
-
-    .download-btn svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    .price-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 24px;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: 100px;
-      font-size: 14px;
-      color: var(--text-secondary);
-    }
-
-    .price-amount {
-      color: var(--text-primary);
-      font-weight: 700;
-      font-size: 18px;
-    }
-
-    /* FAQ Section */
-    .faq {
-      padding: 120px 24px;
-      background: var(--bg-secondary);
-    }
-
-    .faq-container {
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    .faq-header {
-      text-align: center;
-      margin-bottom: 60px;
-    }
-
-    .faq-header h2 {
-      font-size: clamp(32px, 5vw, 48px);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-
-    .faq-list {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .faq-item {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 24px 28px;
-      transition: all 0.2s;
-    }
-
-    .faq-item:hover {
-      border-color: var(--text-muted);
-    }
-
-    .faq-item h3 {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: var(--text-primary);
-    }
-
-    .faq-item p {
-      font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.7;
-    }
-
-    /* Footer */
-    footer {
-      padding: 60px 24px;
-      border-top: 1px solid var(--border-color);
-    }
-
-    .footer-container {
-      max-width: 1200px;
-      margin: 0 auto;
+      max-width: 640px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 24px;
+      margin-bottom: 80px;
     }
 
-    .footer-brand {
+    .wordmark {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+
+    .wordmark-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--blue);
+    }
+
+    .header-link {
+      font-size: 13px;
+      color: var(--ink-muted);
+      text-decoration: none;
+    }
+    .header-link:hover { color: var(--ink-soft); text-decoration: none; }
+
+    .setup-main {
+      width: 100%;
+      max-width: 640px;
+      flex: 1;
+    }
+
+    .setup-title {
+      font-family: var(--serif);
+      font-size: clamp(56px, 9vw, 88px);
+      font-weight: 600;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+
+    .setup-title em {
+      font-style: italic;
+      color: var(--blue);
+      font-weight: 400;
+    }
+
+    .setup-subtitle {
+      font-family: var(--serif);
+      font-size: 22px;
+      color: var(--ink-soft);
+      line-height: 1.4;
+      margin-bottom: 56px;
+      font-weight: 400;
+      max-width: 520px;
+    }
+
+    .field {
+      margin-bottom: 36px;
+    }
+
+    .field-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      margin-bottom: 14px;
+    }
+
+    .duration-pills {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      padding: 12px 22px;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      transition: all 0.15s ease;
+      box-shadow: var(--shadow);
+    }
+    .pill:hover {
+      border-color: var(--blue-soft);
+      color: var(--ink);
+    }
+    .pill.active {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+
+    .custom-input-wrap {
       display: flex;
       align-items: center;
       gap: 8px;
+      padding: 12px 16px;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 999px;
+      font-size: 15px;
+      box-shadow: var(--shadow);
+    }
+    .custom-input-wrap input {
+      width: 50px;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink);
+      text-align: center;
+    }
+    .custom-input-wrap input::-webkit-outer-spin-button,
+    .custom-input-wrap input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .custom-input-wrap span {
+      color: var(--ink-muted);
+    }
+
+    .commitment-input {
+      width: 100%;
+      padding: 16px 20px;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 12px;
+      font-family: var(--serif);
+      font-size: 18px;
+      color: var(--ink);
+      outline: none;
+      box-shadow: var(--shadow);
+      transition: border-color 0.15s ease;
+    }
+    .commitment-input:focus {
+      border-color: var(--blue-soft);
+    }
+    .commitment-input::placeholder {
+      color: var(--ink-muted);
+      font-style: italic;
+    }
+
+    .begin-btn {
+      width: 100%;
+      padding: 20px 24px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      transition: all 0.15s ease;
+      box-shadow: var(--shadow);
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .begin-btn:hover {
+      background: #093558;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(11,63,106,0.1), 0 12px 32px rgba(11,63,106,0.15);
+    }
+    .begin-btn:active {
+      transform: translateY(0);
+    }
+    .begin-btn .arrow {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .setup-foot {
+      margin-top: 80px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--ink-muted);
+    }
+    .setup-foot a { color: var(--ink-muted); text-decoration: underline; text-underline-offset: 3px; }
+    .setup-foot a:hover { color: var(--blue); }
+
+    .resume-banner {
+      max-width: 640px;
+      width: 100%;
+      margin: 0 auto 32px;
+      padding: 14px 20px;
+      background: var(--highlight);
+      border-radius: 10px;
+      font-size: 14px;
+      color: var(--ink-soft);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .resume-banner button {
+      background: transparent;
+      border: 1px solid rgba(0,0,0,0.15);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--ink);
+    }
+    .resume-banner button:hover { background: rgba(0,0,0,0.05); }
+
+    /* ============ WRITING VIEW ============ */
+    .writing {
+      position: fixed;
+      inset: 0;
+      background: var(--paper);
+      display: none;
+      flex-direction: column;
+      z-index: 100;
+    }
+    .writing.active { display: flex; }
+
+    .write-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 32px;
+      border-bottom: 1px solid var(--rule-soft);
+      font-size: 13px;
+      color: var(--ink-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .timer-display .time {
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--ink);
+      letter-spacing: 0.02em;
+    }
+    .timer-display .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .timer-progress {
+      width: 120px;
+      height: 3px;
+      background: var(--rule);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .timer-progress-fill {
+      height: 100%;
+      background: var(--blue);
+      width: 0%;
+      transition: width 1s linear;
+    }
+
+    .word-count {
+      font-family: var(--serif);
+      font-size: 16px;
+      color: var(--ink-soft);
+    }
+    .word-count strong {
+      color: var(--ink);
       font-weight: 600;
     }
 
-    .footer-links {
+    .editor-wrap {
+      flex: 1;
+      overflow-y: auto;
+      padding: 64px 24px 120px;
       display: flex;
-      gap: 32px;
+      justify-content: center;
     }
 
-    .footer-links a {
-      color: var(--text-muted);
-      text-decoration: none;
+    .editor {
+      width: 100%;
+      max-width: 720px;
+      border: none;
+      outline: none;
+      resize: none;
+      background: transparent;
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: 21px;
+      line-height: 1.7;
+      letter-spacing: -0.005em;
+      padding: 0;
+      min-height: 100%;
+    }
+    .editor::placeholder {
+      color: var(--ink-muted);
+      font-style: italic;
+    }
+
+    .commitment-display {
+      max-width: 720px;
+      width: 100%;
+      margin: 0 auto 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--rule-soft);
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--ink-muted);
+      font-size: 15px;
+    }
+    .commitment-display::before { content: '— '; }
+
+    .end-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 32px;
+      background: transparent;
+      border: 1px solid var(--rule);
+      color: var(--ink-muted);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+    .end-btn:hover {
+      border-color: var(--ink-muted);
+      color: var(--ink-soft);
+    }
+
+    /* ============ DONE VIEW ============ */
+    .done {
+      min-height: 100vh;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+      text-align: center;
+    }
+    .done.active { display: flex; }
+
+    .done-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--pale);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 32px;
+      color: var(--blue);
+      font-size: 28px;
+    }
+
+    .done-title {
+      font-family: var(--serif);
+      font-size: clamp(40px, 6vw, 56px);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .done-stats {
+      font-family: var(--serif);
+      font-size: 22px;
+      color: var(--ink-soft);
+      margin-bottom: 8px;
+    }
+    .done-stats strong { color: var(--blue); font-weight: 600; }
+
+    .done-commitment {
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--ink-muted);
+      font-size: 16px;
+      margin-bottom: 48px;
+    }
+
+    .done-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .done-btn {
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-family: var(--sans);
+      font-size: 15px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+    }
+
+    .done-btn.primary {
+      background: var(--blue);
+      color: #fff;
+      box-shadow: var(--shadow);
+    }
+    .done-btn.primary:hover {
+      background: #093558;
+      transform: translateY(-1px);
+    }
+
+    .done-btn.secondary {
+      background: var(--paper);
+      color: var(--ink);
+      border-color: var(--rule);
+      box-shadow: var(--shadow);
+    }
+    .done-btn.secondary:hover {
+      border-color: var(--blue-soft);
+    }
+
+    .session-text {
+      max-width: 640px;
+      margin: 48px auto 0;
+      padding: 24px;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 12px;
+      font-family: var(--serif);
+      font-size: 17px;
+      line-height: 1.6;
+      text-align: left;
+      color: var(--ink-soft);
+      max-height: 240px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    /* ============ ALERTS ============ */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--ink);
+      color: var(--paper);
+      padding: 12px 20px;
+      border-radius: 8px;
       font-size: 14px;
-      transition: color 0.2s;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s ease;
+      z-index: 200;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
 
-    .footer-links a:hover {
-      color: var(--text-primary);
-    }
-
-    .footer-copyright {
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    /* Mobile adjustments */
-    @media (max-width: 768px) {
-      nav {
-        padding: 12px 16px;
-      }
-
-      .nav-links {
-        display: none;
-      }
-
-      .hero {
-        padding: 100px 20px 60px;
-      }
-
-      .app-content {
-        padding: 40px 24px;
-      }
-
-      .editor-line {
-        font-size: 16px;
-      }
-
-      .problem, .features, .how-it-works, .download, .faq {
-        padding: 80px 20px;
-      }
-
-      .footer-container {
-        flex-direction: column;
-        text-align: center;
-      }
+    @media (max-width: 600px) {
+      .setup { padding: 32px 20px; }
+      .setup-header { margin-bottom: 48px; }
+      .setup-subtitle { font-size: 18px; margin-bottom: 40px; }
+      .write-bar { padding: 12px 20px; }
+      .timer-progress { width: 80px; }
+      .editor-wrap { padding: 32px 20px 100px; }
+      .editor { font-size: 19px; }
+      .end-btn { right: 16px; bottom: 16px; }
     }
   </style>
 </head>
 <body>
 
-  <nav>
-    <div class="nav-container">
-      <a href="#" class="logo">
-        <div class="logo-icon"></div>
-        FocusWriter
-      </a>
-      <ul class="nav-links">
-        <li><a href="#problem">Why</a></li>
-        <li><a href="#features">Features</a></li>
-        <li><a href="#how-it-works">How It Works</a></li>
-        <li><a href="#faq">FAQ</a></li>
-      </ul>
-      <div class="nav-buttons">
-        <a href="/download" class="nav-cta">Download</a>
-      </div>
-    </div>
-  </nav>
-
-  <section class="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-content">
-      <div class="hero-badge">
-        <span class="hero-badge-dot"></span>
-        Now available for Mac
-      </div>
-      <h1>Lock in.<br>Write.</h1>
-      <p class="hero-subtitle">FocusWriter takes over your screen and blocks every escape route. No browser. No notifications. No Cmd+Tab. Just you and the words.</p>
-      <div class="hero-buttons">
-        <a href="/download" class="btn-primary">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-          Download for Mac
-        </a>
-        <a href="#how-it-works" class="btn-secondary">See how it works</a>
-      </div>
-      <p class="hero-note">Free for now. No subscription. No account required.</p>
-    </div>
-
-    <div class="app-preview">
-      <div class="app-window">
-        <div class="app-titlebar">
-          <div class="window-controls">
-            <div class="window-control close"></div>
-            <div class="window-control minimize"></div>
-            <div class="window-control maximize"></div>
-          </div>
-          <div class="app-titlebar-text">FocusWriter</div>
-          <div style="width: 52px;"></div>
-        </div>
-        <div class="app-content">
-          <div class="app-timer">
-            <span>23:45 remaining</span>
-            <div class="timer-bar">
-              <div class="timer-progress"></div>
-            </div>
-          </div>
-          <div class="app-editor">
-            <div class="editor-line">The best writing happens when there's nowhere else to go.</div>
-            <div class="editor-line">When every distraction has been removed, something</div>
-            <div class="editor-line">interesting happens. The resistance fades. Words begin</div>
-            <div class="editor-line">to flow.<span class="editor-cursor"></span></div>
-          </div>
-          <div class="app-stats">247 words</div>
-          <div class="app-glow"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="problem" id="problem">
-    <div class="problem-container animate-on-scroll">
-      <span class="section-label">The Problem</span>
-      <h2>Willpower is finite.<br>Your environment isn't.</h2>
-      <p class="problem-text">You've told yourself a thousand times that today is the day you'll finally write. You open your laptop, ready to create. And then... you check your email. Just for a second. Then a quick look at the news. Before you know it, two hours have passed and your document is still blank.</p>
-      <p class="problem-text"><span class="problem-highlight">Every time you resist the urge to switch tabs, you deplete a little more willpower.</span> The problem isn't that you lack discipline. The problem is that your environment is designed to steal your attention.</p>
-      <p class="problem-text">The solution isn't to try harder. It's to <span class="problem-highlight">remove the possibility of distraction entirely.</span></p>
-    </div>
-  </section>
-
-  <section class="features" id="features">
-    <div class="features-container">
-      <div class="features-header animate-on-scroll">
-        <span class="section-label">Features</span>
-        <h2>Everything removed.<br>Except writing.</h2>
-      </div>
-      <div class="features-grid">
-        <div class="feature-card animate-on-scroll">
-          <div class="feature-icon">&#128274;</div>
-          <h3>True Screen Lock</h3>
-          <p>Your entire screen becomes the writing space. No dock, no menu bar, no notifications. Everything else disappears.</p>
-        </div>
-        <div class="feature-card animate-on-scroll">
-          <div class="feature-icon">&#9000;</div>
-          <h3>Blocked Shortcuts</h3>
-          <p>Cmd+Tab, Cmd+Q, Force Quit, Escape - none of them work. The only way out is through.</p>
-        </div>
-        <div class="feature-card animate-on-scroll">
-          <div class="feature-icon">&#9201;</div>
-          <h3>Flexible Goals</h3>
-          <p>Set a timer (15 min to 2 hours) or a word count target. The session ends when you've done what you committed to.</p>
-        </div>
-        <div class="feature-card animate-on-scroll">
-          <div class="feature-icon">&#9998;</div>
-          <h3>Minimal Editor</h3>
-          <p>A clean writing interface. No formatting options to fiddle with. No settings to tweak. Just words.</p>
-        </div>
-        <div class="feature-card animate-on-scroll">
-          <div class="feature-icon">&#128190;</div>
-          <h3>Auto-Save</h3>
-          <p>Your work is saved every few seconds. Even if something goes wrong, your words are safe.</p>
-        </div>
-        <div class="feature-card animate-on-scroll">
-          <div class="feature-icon">&#128682;</div>
-          <h3>Emergency Exit</h3>
-          <p>For genuine emergencies, type a long phrase to unlock. Intentionally inconvenient.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="how-it-works" id="how-it-works">
-    <div class="how-container">
-      <div class="how-header animate-on-scroll">
-        <span class="section-label">How It Works</span>
-        <h2>Four steps to focus</h2>
-      </div>
-
-      <div class="steps-container">
-        <div class="step animate-on-scroll">
-          <div class="step-content">
-            <div class="step-number">1</div>
-            <h3>Choose your commitment</h3>
-            <p>Select a time duration or set a word count goal. This is your contract with yourself. Once you click Start, there's no going back.</p>
-          </div>
-          <div class="step-visual">
-            <div class="step-mockup commitment-mockup">
-              <div class="commitment-title">How long will you write?</div>
-              <div class="commitment-options">
-                <div class="commitment-option">15 min</div>
-                <div class="commitment-option active">30 min</div>
-                <div class="commitment-option">60 min</div>
-                <div class="commitment-option">2 hrs</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="step animate-on-scroll">
-          <div class="step-content">
-            <div class="step-number">2</div>
-            <h3>Enter the writing space</h3>
-            <p>Your screen transforms. The dock vanishes. The menu bar disappears. Every other app becomes unreachable. You're locked in.</p>
-          </div>
-          <div class="step-visual">
-            <div class="step-mockup locked-mockup">
-              <div class="locked-overlay"></div>
-              <div class="locked-icon">&#128274;</div>
-              <div class="locked-text">Cmd+Tab disabled &bull; Force Quit blocked</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="step animate-on-scroll">
-          <div class="step-content">
-            <div class="step-number">3</div>
-            <h3>Write</h3>
-            <p>With no distractions possible, something interesting happens. The resistance fades. Words begin to flow. This is what writing feels like when it's the only option.</p>
-          </div>
-          <div class="step-visual">
-            <div class="step-mockup writing-mockup">
-              <span class="typed">The best ideas come when you stop fighting yourself. When you remove the option to procrastinate, all that's left is the work.</span><span class="editor-cursor"></span>
-            </div>
-          </div>
-        </div>
-
-        <div class="step animate-on-scroll">
-          <div class="step-content">
-            <div class="step-number">4</div>
-            <h3>Export and repeat</h3>
-            <p>When the session ends, save your document wherever you'd like. Then do it again tomorrow. Build the habit.</p>
-          </div>
-          <div class="step-visual">
-            <div class="step-mockup export-mockup">
-              <div class="export-icon">&#128196;</div>
-              <div class="export-text">Session complete. 847 words written.</div>
-              <div class="export-filename">~/Documents/draft-chapter-3.txt</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="social-proof">
-    <div class="social-container animate-on-scroll">
-      <div class="testimonial">
-        <p class="testimonial-quote">"I've tried every productivity app. This is the only one that actually works because it doesn't give me a choice."</p>
-        <div class="testimonial-author">
-          <div class="author-avatar"></div>
-          <div class="author-info">
-            <div class="author-name">Early User</div>
-            <div class="author-title">Writer & Newsletter Author</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="download" id="download">
-    <div class="download-bg"></div>
-    <div class="download-container animate-on-scroll">
-      <h2>Start writing today</h2>
-      <p class="download-subtitle">No subscriptions. No accounts. Just download, install, and write.</p>
-      <div class="download-buttons">
-        <a href="/download" class="download-btn mac">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-          Get FocusWriter for Mac
-        </a>
-        <a href="#" class="download-btn windows" style="opacity: 0.5; cursor: not-allowed;">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 12V6.75l6-1.32v6.48L3 12zm17-9v8.75l-10 .15V5.21L20 3zM3 13l6 .09v6.81l-6-1.15V13zm17 .25V22l-10-1.91V13.1l10 .15z"/></svg>
-          Windows (Coming Soon)
-        </a>
-      </div>
-      <div class="price-tag">
-        <span class="price-amount">Free</span>
-        <span>for now</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="faq" id="faq">
-    <div class="faq-container">
-      <div class="faq-header animate-on-scroll">
-        <span class="section-label">FAQ</span>
-        <h2>Questions</h2>
-      </div>
-      <div class="faq-list">
-        <div class="faq-item animate-on-scroll">
-          <h3>What if I have a real emergency?</h3>
-          <p>FocusWriter includes an emergency exit. Type the phrase "I understand this defeats the purpose of focused writing" to unlock early. It's intentionally inconvenient - easy enough for a genuine emergency, annoying enough that you won't use it to check Twitter.</p>
-        </div>
-        <div class="faq-item animate-on-scroll">
-          <h3>What macOS versions are supported?</h3>
-          <p>FocusWriter works on macOS 10.15 (Catalina) and later, including Apple Silicon Macs. Windows support is coming soon.</p>
-        </div>
-        <div class="faq-item animate-on-scroll">
-          <h3>What if the app crashes?</h3>
-          <p>Your work is auto-saved every few seconds to a recovery file. If anything goes wrong, your words will be waiting for you when you reopen the app.</p>
-        </div>
-        <div class="faq-item animate-on-scroll">
-          <h3>Can I use my own text editor?</h3>
-          <p>FocusWriter is a complete writing environment - you write directly in the app. When your session ends, you can export to a .txt or .md file and continue editing elsewhere.</p>
-        </div>
-        <div class="faq-item animate-on-scroll">
-          <h3>How much does it cost?</h3>
-          <p>FocusWriter is free for now while it's in early release. If that changes down the road, you'll keep what you've already downloaded.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    <div class="footer-container">
-      <div class="footer-brand">
-        <div class="logo-icon" style="width: 20px; height: 20px; border-radius: 4px;"></div>
+  <!-- ============ SETUP ============ -->
+  <main class="setup" id="setup-view">
+    <header class="setup-header">
+      <div class="wordmark">
+        <div class="wordmark-dot"></div>
         FocusWriter
       </div>
-      <div class="footer-links">
-        <a href="https://moretothat.com">More To That</a>
-        <a href="mailto:hello@moretothat.com">Contact</a>
-        <a href="#">Privacy</a>
+      <a href="#about" class="header-link" id="about-link">About</a>
+    </header>
+
+    <div id="resume-banner-slot"></div>
+
+    <div class="setup-main">
+      <h1 class="setup-title">Just <em>write</em>.</h1>
+      <p class="setup-subtitle">A calm, fullscreen space with a timer. No accounts, no distractions, no friction. Pick a length, hit begin.</p>
+
+      <div class="field">
+        <div class="field-label">How long?</div>
+        <div class="duration-pills">
+          <button class="pill" data-min="5">5 min</button>
+          <button class="pill active" data-min="15">15 min</button>
+          <button class="pill" data-min="30">30 min</button>
+          <button class="pill" data-min="60">60 min</button>
+          <button class="pill" data-min="120">2 hrs</button>
+          <div class="custom-input-wrap">
+            <input type="number" id="custom-min" min="1" max="480" placeholder="—">
+            <span>min</span>
+          </div>
+        </div>
       </div>
-      <div class="footer-copyright">
-        &copy; 2026 More To That
+
+      <div class="field">
+        <div class="field-label">What will you write? <span style="text-transform: none; font-weight: 400; color: var(--ink-muted);">(optional)</span></div>
+        <input type="text" class="commitment-input" id="commitment" placeholder="A scene from chapter three. A letter to my brother. Anything, really.">
+      </div>
+
+      <button class="begin-btn" id="begin-btn">
+        Begin
+        <span class="arrow">&rarr;</span>
+      </button>
+    </div>
+
+    <footer class="setup-foot">
+      Auto-saves to your browser. Your writing never leaves this device.
+      <br>
+      Made by <a href="https://moretothat.com">More to That</a>.
+    </footer>
+  </main>
+
+  <!-- ============ WRITING ============ -->
+  <section class="writing" id="writing-view">
+    <div class="write-bar">
+      <div class="timer-display">
+        <span class="time" id="time-display">15:00</span>
+        <div class="timer-progress"><div class="timer-progress-fill" id="timer-fill"></div></div>
+      </div>
+      <div class="word-count"><strong id="words-display">0</strong> words</div>
+    </div>
+    <div class="editor-wrap">
+      <div style="width:100%; max-width: 720px; display: flex; flex-direction: column;">
+        <div class="commitment-display" id="commitment-display" style="display:none;"></div>
+        <textarea class="editor" id="editor" placeholder="Begin." autofocus spellcheck="true"></textarea>
       </div>
     </div>
-  </footer>
+    <button class="end-btn" id="end-btn">End session</button>
+  </section>
+
+  <!-- ============ DONE ============ -->
+  <section class="done" id="done-view">
+    <div class="done-icon">&#10003;</div>
+    <h1 class="done-title">Session complete.</h1>
+    <p class="done-stats"><strong id="done-words">0</strong> words in <strong id="done-time">15 minutes</strong>.</p>
+    <p class="done-commitment" id="done-commitment" style="display:none;"></p>
+    <div class="done-actions">
+      <button class="done-btn primary" id="download-btn">Download as .txt</button>
+      <button class="done-btn secondary" id="copy-btn">Copy to clipboard</button>
+      <button class="done-btn secondary" id="again-btn">Write again</button>
+    </div>
+    <pre class="session-text" id="session-preview"></pre>
+  </section>
+
+  <div class="toast" id="toast"></div>
 
   <script>
-    // Scroll-triggered animations
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
+    // ============ STATE ============
+    const STORAGE_KEY = 'focuswriter:draft';
+    const SETTINGS_KEY = 'focuswriter:lastSettings';
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
+    const setupView = document.getElementById('setup-view');
+    const writingView = document.getElementById('writing-view');
+    const doneView = document.getElementById('done-view');
+    const editor = document.getElementById('editor');
+    const timeDisplay = document.getElementById('time-display');
+    const timerFill = document.getElementById('timer-fill');
+    const wordsDisplay = document.getElementById('words-display');
+    const commitmentInput = document.getElementById('commitment');
+    const commitmentDisplay = document.getElementById('commitment-display');
+    const customMinInput = document.getElementById('custom-min');
+    const beginBtn = document.getElementById('begin-btn');
+    const endBtn = document.getElementById('end-btn');
+    const pills = document.querySelectorAll('.pill');
+    const toast = document.getElementById('toast');
+
+    let durationMin = 15;
+    let durationSec = 15 * 60;
+    let remainingSec = durationSec;
+    let tickInterval = null;
+    let saveTimeout = null;
+    let sessionStartedAt = null;
+    let currentCommitment = '';
+
+    // ============ HELPERS ============
+    function showToast(msg, ms = 2400) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), ms);
+    }
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function formatDuration(min) {
+      if (min >= 60 && min % 60 === 0) {
+        const h = min / 60;
+        return h === 1 ? '1 hour' : `${h} hours`;
+      }
+      if (min >= 60) {
+        const h = Math.floor(min / 60);
+        const m = min % 60;
+        return `${h}h ${m}m`;
+      }
+      return `${min} minute${min === 1 ? '' : 's'}`;
+    }
+
+    function countWords(text) {
+      const trimmed = text.trim();
+      if (!trimmed) return 0;
+      return trimmed.split(/\s+/).length;
+    }
+
+    // ============ SETUP ============
+    function loadSettings() {
+      try {
+        const raw = localStorage.getItem(SETTINGS_KEY);
+        if (!raw) return;
+        const s = JSON.parse(raw);
+        if (s.durationMin) {
+          setDuration(s.durationMin);
+        }
+      } catch (e) {}
+    }
+
+    function saveSettings() {
+      try {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify({ durationMin }));
+      } catch (e) {}
+    }
+
+    function setDuration(min) {
+      durationMin = min;
+      durationSec = min * 60;
+      remainingSec = durationSec;
+      // sync UI
+      let matched = false;
+      pills.forEach(p => {
+        const m = parseInt(p.dataset.min, 10);
+        if (m === min) {
+          p.classList.add('active');
+          matched = true;
+        } else {
+          p.classList.remove('active');
         }
       });
-    }, observerOptions);
+      if (!matched) {
+        customMinInput.value = min;
+      } else {
+        customMinInput.value = '';
+      }
+      timeDisplay.textContent = formatTime(remainingSec);
+    }
 
-    document.querySelectorAll('.animate-on-scroll').forEach(el => {
-      observer.observe(el);
+    pills.forEach(p => {
+      p.addEventListener('click', () => {
+        setDuration(parseInt(p.dataset.min, 10));
+        saveSettings();
+      });
     });
 
-    // Smooth scroll for navigation links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function(e) {
+    customMinInput.addEventListener('input', () => {
+      const v = parseInt(customMinInput.value, 10);
+      if (v && v > 0 && v <= 480) {
+        pills.forEach(p => p.classList.remove('active'));
+        durationMin = v;
+        durationSec = v * 60;
+        remainingSec = durationSec;
+        timeDisplay.textContent = formatTime(remainingSec);
+        saveSettings();
+      }
+    });
+
+    // ============ RESUME DRAFT ============
+    function checkResume() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const draft = JSON.parse(raw);
+        if (!draft.text || !draft.text.trim()) return;
+        const slot = document.getElementById('resume-banner-slot');
+        const banner = document.createElement('div');
+        banner.className = 'resume-banner';
+        const wc = countWords(draft.text);
+        banner.innerHTML = `
+          <span>You have an unfinished draft (${wc} words).</span>
+          <span style="display:flex; gap:8px;">
+            <button id="resume-btn">Resume</button>
+            <button id="discard-btn">Discard</button>
+          </span>
+        `;
+        slot.appendChild(banner);
+        document.getElementById('resume-btn').onclick = () => {
+          editor.value = draft.text;
+          if (draft.commitment) {
+            commitmentInput.value = draft.commitment;
+          }
+          beginSession();
+        };
+        document.getElementById('discard-btn').onclick = () => {
+          localStorage.removeItem(STORAGE_KEY);
+          banner.remove();
+        };
+      } catch (e) {}
+    }
+
+    // ============ SESSION ============
+    function beginSession() {
+      currentCommitment = commitmentInput.value.trim();
+      if (currentCommitment) {
+        commitmentDisplay.textContent = currentCommitment;
+        commitmentDisplay.style.display = 'block';
+      } else {
+        commitmentDisplay.style.display = 'none';
+      }
+
+      setupView.style.display = 'none';
+      writingView.classList.add('active');
+      doneView.classList.remove('active');
+
+      sessionStartedAt = Date.now();
+      remainingSec = durationSec;
+      updateTimerUI();
+      updateWordCount();
+
+      // Best-effort fullscreen (browsers require user gesture, which this is)
+      const root = document.documentElement;
+      if (root.requestFullscreen) {
+        root.requestFullscreen().catch(() => {});
+      }
+
+      // Focus editor
+      setTimeout(() => editor.focus(), 50);
+
+      // Start ticking
+      tickInterval = setInterval(tick, 1000);
+
+      // Set up beforeunload warning
+      window.addEventListener('beforeunload', beforeUnloadHandler);
+    }
+
+    function tick() {
+      remainingSec--;
+      updateTimerUI();
+      if (remainingSec <= 0) {
+        completeSession();
+      }
+    }
+
+    function updateTimerUI() {
+      timeDisplay.textContent = formatTime(Math.max(0, remainingSec));
+      const pct = ((durationSec - remainingSec) / durationSec) * 100;
+      timerFill.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+    }
+
+    function updateWordCount() {
+      wordsDisplay.textContent = countWords(editor.value);
+    }
+
+    editor.addEventListener('input', () => {
+      updateWordCount();
+      // Debounced save
+      if (saveTimeout) clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(() => {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            text: editor.value,
+            commitment: currentCommitment,
+            savedAt: Date.now(),
+          }));
+        } catch (e) {}
+      }, 800);
+    });
+
+    function completeSession() {
+      clearInterval(tickInterval);
+      tickInterval = null;
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
+
+      const text = editor.value;
+      const wc = countWords(text);
+
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+
+      writingView.classList.remove('active');
+      doneView.classList.add('active');
+      setupView.style.display = 'none';
+
+      document.getElementById('done-words').textContent = wc.toLocaleString();
+      document.getElementById('done-time').textContent = formatDuration(durationMin);
+      const dc = document.getElementById('done-commitment');
+      if (currentCommitment) {
+        dc.textContent = `— ${currentCommitment}`;
+        dc.style.display = 'block';
+      } else {
+        dc.style.display = 'none';
+      }
+      document.getElementById('session-preview').textContent = text || '(no text written)';
+
+      // Clear draft now that session is complete
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    }
+
+    function endEarly() {
+      const wc = countWords(editor.value);
+      const elapsed = Math.round((Date.now() - sessionStartedAt) / 60000);
+      const remaining = Math.ceil(remainingSec / 60);
+      const msg = wc < 10
+        ? 'End the session? Your draft will be saved.'
+        : `End early? You've written ${wc} words and have ${remaining} min left. Your draft is saved either way.`;
+      if (confirm(msg)) {
+        // Treat as complete with actual elapsed time
+        durationMin = Math.max(1, elapsed);
+        completeSession();
+      }
+    }
+
+    function beforeUnloadHandler(e) {
+      if (countWords(editor.value) > 0) {
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
-      });
+        e.returnValue = '';
+      }
+    }
+
+    beginBtn.addEventListener('click', beginSession);
+    endBtn.addEventListener('click', endEarly);
+
+    // Keep word count fresh on selection / paste
+    editor.addEventListener('paste', () => setTimeout(updateWordCount, 0));
+
+    // ============ DONE ACTIONS ============
+    document.getElementById('download-btn').addEventListener('click', () => {
+      const text = document.getElementById('session-preview').textContent;
+      const filename = makeFilename(currentCommitment);
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Downloaded.');
     });
 
-  </script>
+    document.getElementById('copy-btn').addEventListener('click', async () => {
+      const text = document.getElementById('session-preview').textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('Copied to clipboard.');
+      } catch (e) {
+        showToast('Could not copy. Try selecting the text manually.');
+      }
+    });
 
+    document.getElementById('again-btn').addEventListener('click', () => {
+      editor.value = '';
+      commitmentInput.value = '';
+      currentCommitment = '';
+      doneView.classList.remove('active');
+      setupView.style.display = 'flex';
+      window.scrollTo(0, 0);
+    });
+
+    function makeFilename(commitment) {
+      const date = new Date().toISOString().slice(0, 10);
+      let slug = (commitment || 'session')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 40) || 'session';
+      return `focuswriter-${date}-${slug}.txt`;
+    }
+
+    // ============ INIT ============
+    loadSettings();
+    checkResume();
+
+    // Cmd/Ctrl+Enter from setup view starts the session
+    document.addEventListener('keydown', (e) => {
+      if (setupView.style.display === 'none') return;
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        beginSession();
+      }
+    });
+
+    // About link
+    document.getElementById('about-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      alert('FocusWriter is a calm, distraction-free writing space. Made by Lawrence Yeo at More to That.\n\nYour writing is auto-saved to this browser only — never sent anywhere. Download or copy when you\'re done.');
+    });
+  </script>
 </body>
 </html>
