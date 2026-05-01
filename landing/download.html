@@ -78,7 +78,7 @@
     .step-content { padding-top: 3px; }
     .step-content strong { display: block; margin-bottom: 4px; }
     .step-content p { color: var(--text-secondary); font-size: 14px; }
-    .step-content code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; color: var(--accent-cyan); }
+    .step-content code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--bg-tertiary); padding: 8px 12px; border-radius: 6px; color: var(--accent-cyan); display: inline-block; user-select: all; word-break: break-all; }
 
     .support { text-align: center; margin-top: 60px; padding-top: 40px; border-top: 1px solid var(--border-color); }
     .support p { color: var(--text-muted); font-size: 14px; }
@@ -156,15 +156,17 @@
         <li>
           <div class="step-num">3</div>
           <div class="step-content">
-            <strong>Grant permissions</strong>
-            <p>On first launch, right-click the app and choose Open. You may need to allow it in System Settings &rsaquo; Privacy &amp; Security.</p>
+            <strong>Bypass Gatekeeper (one-time)</strong>
+            <p>FocusWriter isn't notarized with Apple yet, so on first open you'll see a "FocusWriter is damaged" warning. To fix it, open <strong>Terminal</strong> (Cmd+Space, type "Terminal") and run:</p>
+            <p><code>xattr -cr /Applications/FocusWriter.app</code></p>
+            <p>This is a one-time step. Apple flags any app not signed with a paid developer certificate — the app itself is fine.</p>
           </div>
         </li>
         <li>
           <div class="step-num">4</div>
           <div class="step-content">
             <strong>Start writing</strong>
-            <p>Choose a time or word goal, and lock yourself in. Happy writing!</p>
+            <p>Open FocusWriter, choose a time or word goal, and lock yourself in. Happy writing!</p>
           </div>
         </li>
       </ol>
