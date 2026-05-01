@@ -1,0 +1,14 @@
+{
+  "name": "presentation-options",
+  "version": "1.0.0",
+  "description": "Native addon to control macOS presentation options",
+  "main": "index.js",
+  "scripts": {
+    "build": "node-gyp rebuild",
+    "install": "node-gyp rebuild"
+  },
+  "dependencies": {
+    "node-addon-api": "^7.0.0",
+    "node-gyp": "^10.0.0"
+  }
+}

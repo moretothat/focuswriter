@@ -13,20 +13,26 @@
   "license": "proprietary",
   "devDependencies": {
     "electron": "^28.0.0",
-    "electron-builder": "^24.9.1"
+    "electron-builder": "^24.9.1",
+    "electron-rebuild": "^3.2.9"
   },
   "build": {
     "appId": "com.focuswriter.app",
     "productName": "FocusWriter",
     "mac": {
       "category": "public.app-category.productivity",
-      "target": ["dmg", "zip"],
+      "target": [
+        "dmg",
+        "zip"
+      ],
       "icon": "assets/icon.icns",
       "hardenedRuntime": true,
       "gatekeeperAssess": false
     },
     "win": {
-      "target": ["nsis"],
+      "target": [
+        "nsis"
+      ],
       "icon": "assets/icon.ico"
     },
     "dmg": {
@@ -49,5 +55,8 @@
       "src/**/*",
       "assets/**/*"
     ]
+  },
+  "dependencies": {
+    "node-global-key-listener": "^0.3.0"
   }
 }

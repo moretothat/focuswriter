@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FocusWriter - Lock In. Write.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0a0b;
+      --bg-secondary: #111113;
+      --bg-tertiary: #18181b;
+      --bg-card: #1a1a1d;
+      --text-primary: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent-cyan: #22d3ee;
+      --accent-purple: #a78bfa;
+      --accent-blue: #3b82f6;
+      --accent-green: #4ade80;
+      --accent-orange: #fb923c;
+      --border-color: #27272a;
+      --gradient-1: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #d946ef 100%);
+      --gradient-2: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background-color: var(--bg-primary);
+      overflow-x: hidden;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
+
+    .animate-on-scroll {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .animate-on-scroll.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 24px;
+      background: rgba(10, 10, 11, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      background: var(--gradient-2);
+      border-radius: 6px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-cta {
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .nav-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
+    }
+
+    .nav-buttons {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-link-btn {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 10px 16px;
+      transition: color 0.2s;
+    }
+
+    .nav-link-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-user-name {
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 120px 24px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 40%),
+                  radial-gradient(ellipse at 20% 80%, rgba(34, 211, 238, 0.08) 0%, transparent 40%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      text-align: center;
+      max-width: 900px;
+      position: relative;
+      z-index: 1;
+      animation: fadeInUp 0.8s ease;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: 100px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    .hero-badge-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    .hero h1 {
+      font-size: clamp(48px, 8vw, 80px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+      background: linear-gradient(180deg, #fff 0%, #a1a1aa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(18px, 2.5vw, 22px);
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      padding: 14px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--text-primary);
+      padding: 14px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-tertiary);
+      border-color: var(--text-muted);
+    }
+
+    .hero-note {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* App Preview */
+    .app-preview {
+      margin-top: 80px;
+      width: 100%;
+      max-width: 1000px;
+      position: relative;
+      animation: fadeInUp 0.8s ease 0.2s both;
+    }
+
+    .app-window {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 25px 100px -20px rgba(0, 0, 0, 0.5),
+                  0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    }
+
+    .app-titlebar {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .window-control {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .window-control.close { background: #ff5f57; }
+    .window-control.minimize { background: #febc2e; }
+    .window-control.maximize { background: #28c840; }
+
+    .app-titlebar-text {
+      flex: 1;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .app-content {
+      padding: 60px;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .app-timer {
+      font-size: 14px;
+      color: var(--accent-cyan);
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .timer-bar {
+      width: 200px;
+      height: 4px;
+      background: var(--bg-tertiary);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .timer-progress {
+      width: 65%;
+      height: 100%;
+      background: var(--gradient-2);
+      border-radius: 2px;
+    }
+
+    .app-editor {
+      width: 100%;
+      max-width: 700px;
+      text-align: left;
+    }
+
+    .editor-line {
+      font-size: 20px;
+      line-height: 1.8;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .editor-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 24px;
+      background: var(--accent-cyan);
+      margin-left: 2px;
+      animation: blink 1s infinite;
+      vertical-align: middle;
+    }
+
+    .app-stats {
+      position: absolute;
+      bottom: 20px;
+      right: 24px;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .app-glow {
+      position: absolute;
+      bottom: -50%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 300px;
+      background: radial-gradient(ellipse, rgba(34, 211, 238, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Problem Section */
+    .problem {
+      padding: 120px 24px;
+      position: relative;
+    }
+
+    .problem-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+    }
+
+    .problem h2 {
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 40px;
+    }
+
+    .problem-text {
+      font-size: 18px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: 24px;
+    }
+
+    .problem-highlight {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    /* Features Section */
+    .features {
+      padding: 120px 24px;
+      background: var(--bg-secondary);
+    }
+
+    .features-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .features-header {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+
+    .features h2 {
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 32px;
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+      border-color: var(--text-muted);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    .feature-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* How It Works */
+    .how-it-works {
+      padding: 120px 24px;
+    }
+
+    .how-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .how-header {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+
+    .how-header h2 {
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 80px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .step:nth-child(even) {
+      direction: rtl;
+    }
+
+    .step:nth-child(even) > * {
+      direction: ltr;
+    }
+
+    .step-content {
+      padding: 20px 0;
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: var(--gradient-2);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .step-content h3 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    .step-content p {
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .step-visual {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 280px;
+    }
+
+    .step-mockup {
+      width: 100%;
+    }
+
+    /* Commitment Selector Mockup */
+    .commitment-mockup {
+      text-align: center;
+    }
+
+    .commitment-title {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .commitment-options {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .commitment-option {
+      padding: 16px 24px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+
+    .commitment-option.active {
+      background: var(--accent-cyan);
+      color: var(--bg-primary);
+      border-color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    /* Locked Screen Mockup */
+    .locked-mockup {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background: var(--bg-primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .locked-overlay {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(255,255,255,0.02) 10px,
+        rgba(255,255,255,0.02) 20px
+      );
+    }
+
+    .locked-icon {
+      font-size: 48px;
+      color: var(--accent-purple);
+    }
+
+    .locked-text {
+      position: absolute;
+      bottom: 16px;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Writing Mockup */
+    .writing-mockup {
+      text-align: left;
+      font-family: Georgia, serif;
+      font-size: 16px;
+      line-height: 1.9;
+      color: var(--text-secondary);
+    }
+
+    .writing-mockup .typed {
+      color: var(--text-primary);
+    }
+
+    /* Export Mockup */
+    .export-mockup {
+      text-align: center;
+    }
+
+    .export-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .export-text {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .export-filename {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--accent-green);
+      margin-top: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .step {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .step:nth-child(even) {
+        direction: ltr;
+      }
+    }
+
+    /* Social Proof */
+    .social-proof {
+      padding: 80px 24px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .social-container {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .testimonial {
+      margin-bottom: 32px;
+    }
+
+    .testimonial-quote {
+      font-size: clamp(20px, 3vw, 28px);
+      font-weight: 500;
+      line-height: 1.5;
+      margin-bottom: 24px;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .author-avatar {
+      width: 48px;
+      height: 48px;
+      background: var(--gradient-1);
+      border-radius: 50%;
+    }
+
+    .author-info {
+      text-align: left;
+    }
+
+    .author-name {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .author-title {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Download Section */
+    .download {
+      padding: 120px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .download-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 100%, rgba(34, 211, 238, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .download-container {
+      max-width: 700px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .download h2 {
+      font-size: clamp(36px, 6vw, 56px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+      background: linear-gradient(180deg, #fff 0%, #a1a1aa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .download-subtitle {
+      font-size: 18px;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+    }
+
+    .download-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .download-btn.mac {
+      background: var(--text-primary);
+      color: var(--bg-primary);
+    }
+
+    .download-btn.mac:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(255, 255, 255, 0.2);
+    }
+
+    .download-btn.windows {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .download-btn.windows:hover {
+      background: var(--bg-card);
+      border-color: var(--text-muted);
+    }
+
+    .download-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .price-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 100px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .price-amount {
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    /* FAQ Section */
+    .faq {
+      padding: 120px 24px;
+      background: var(--bg-secondary);
+    }
+
+    .faq-container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .faq-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .faq-header h2 {
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .faq-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px 28px;
+      transition: all 0.2s;
+    }
+
+    .faq-item:hover {
+      border-color: var(--text-muted);
+    }
+
+    .faq-item h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+
+    .faq-item p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* Footer */
+    footer {
+      padding: 60px 24px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 32px;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--text-primary);
+    }
+
+    .footer-copyright {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+      nav {
+        padding: 12px 16px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        padding: 100px 20px 60px;
+      }
+
+      .app-content {
+        padding: 40px 24px;
+      }
+
+      .editor-line {
+        font-size: 16px;
+      }
+
+      .problem, .features, .how-it-works, .download, .faq {
+        padding: 80px 20px;
+      }
+
+      .footer-container {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-container">
+      <a href="#" class="logo">
+        <div class="logo-icon"></div>
+        FocusWriter
+      </a>
+      <ul class="nav-links">
+        <li><a href="#problem">Why</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <div class="nav-buttons">
+        <a href="/download" class="nav-cta">Download</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        Now available for Mac
+      </div>
+      <h1>Lock in.<br>Write.</h1>
+      <p class="hero-subtitle">FocusWriter takes over your screen and blocks every escape route. No browser. No notifications. No Cmd+Tab. Just you and the words.</p>
+      <div class="hero-buttons">
+        <a href="/download" class="btn-primary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          Download for Mac
+        </a>
+        <a href="#how-it-works" class="btn-secondary">See how it works</a>
+      </div>
+      <p class="hero-note">Free for now. No subscription. No account required.</p>
+    </div>
+
+    <div class="app-preview">
+      <div class="app-window">
+        <div class="app-titlebar">
+          <div class="window-controls">
+            <div class="window-control close"></div>
+            <div class="window-control minimize"></div>
+            <div class="window-control maximize"></div>
+          </div>
+          <div class="app-titlebar-text">FocusWriter</div>
+          <div style="width: 52px;"></div>
+        </div>
+        <div class="app-content">
+          <div class="app-timer">
+            <span>23:45 remaining</span>
+            <div class="timer-bar">
+              <div class="timer-progress"></div>
+            </div>
+          </div>
+          <div class="app-editor">
+            <div class="editor-line">The best writing happens when there's nowhere else to go.</div>
+            <div class="editor-line">When every distraction has been removed, something</div>
+            <div class="editor-line">interesting happens. The resistance fades. Words begin</div>
+            <div class="editor-line">to flow.<span class="editor-cursor"></span></div>
+          </div>
+          <div class="app-stats">247 words</div>
+          <div class="app-glow"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="problem" id="problem">
+    <div class="problem-container animate-on-scroll">
+      <span class="section-label">The Problem</span>
+      <h2>Willpower is finite.<br>Your environment isn't.</h2>
+      <p class="problem-text">You've told yourself a thousand times that today is the day you'll finally write. You open your laptop, ready to create. And then... you check your email. Just for a second. Then a quick look at the news. Before you know it, two hours have passed and your document is still blank.</p>
+      <p class="problem-text"><span class="problem-highlight">Every time you resist the urge to switch tabs, you deplete a little more willpower.</span> The problem isn't that you lack discipline. The problem is that your environment is designed to steal your attention.</p>
+      <p class="problem-text">The solution isn't to try harder. It's to <span class="problem-highlight">remove the possibility of distraction entirely.</span></p>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <div class="features-container">
+      <div class="features-header animate-on-scroll">
+        <span class="section-label">Features</span>
+        <h2>Everything removed.<br>Except writing.</h2>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card animate-on-scroll">
+          <div class="feature-icon">&#128274;</div>
+          <h3>True Screen Lock</h3>
+          <p>Your entire screen becomes the writing space. No dock, no menu bar, no notifications. Everything else disappears.</p>
+        </div>
+        <div class="feature-card animate-on-scroll">
+          <div class="feature-icon">&#9000;</div>
+          <h3>Blocked Shortcuts</h3>
+          <p>Cmd+Tab, Cmd+Q, Force Quit, Escape - none of them work. The only way out is through.</p>
+        </div>
+        <div class="feature-card animate-on-scroll">
+          <div class="feature-icon">&#9201;</div>
+          <h3>Flexible Goals</h3>
+          <p>Set a timer (15 min to 2 hours) or a word count target. The session ends when you've done what you committed to.</p>
+        </div>
+        <div class="feature-card animate-on-scroll">
+          <div class="feature-icon">&#9998;</div>
+          <h3>Minimal Editor</h3>
+          <p>A clean writing interface. No formatting options to fiddle with. No settings to tweak. Just words.</p>
+        </div>
+        <div class="feature-card animate-on-scroll">
+          <div class="feature-icon">&#128190;</div>
+          <h3>Auto-Save</h3>
+          <p>Your work is saved every few seconds. Even if something goes wrong, your words are safe.</p>
+        </div>
+        <div class="feature-card animate-on-scroll">
+          <div class="feature-icon">&#128682;</div>
+          <h3>Emergency Exit</h3>
+          <p>For genuine emergencies, type a long phrase to unlock. Intentionally inconvenient.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-it-works" id="how-it-works">
+    <div class="how-container">
+      <div class="how-header animate-on-scroll">
+        <span class="section-label">How It Works</span>
+        <h2>Four steps to focus</h2>
+      </div>
+
+      <div class="steps-container">
+        <div class="step animate-on-scroll">
+          <div class="step-content">
+            <div class="step-number">1</div>
+            <h3>Choose your commitment</h3>
+            <p>Select a time duration or set a word count goal. This is your contract with yourself. Once you click Start, there's no going back.</p>
+          </div>
+          <div class="step-visual">
+            <div class="step-mockup commitment-mockup">
+              <div class="commitment-title">How long will you write?</div>
+              <div class="commitment-options">
+                <div class="commitment-option">15 min</div>
+                <div class="commitment-option active">30 min</div>
+                <div class="commitment-option">60 min</div>
+                <div class="commitment-option">2 hrs</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step animate-on-scroll">
+          <div class="step-content">
+            <div class="step-number">2</div>
+            <h3>Enter the writing space</h3>
+            <p>Your screen transforms. The dock vanishes. The menu bar disappears. Every other app becomes unreachable. You're locked in.</p>
+          </div>
+          <div class="step-visual">
+            <div class="step-mockup locked-mockup">
+              <div class="locked-overlay"></div>
+              <div class="locked-icon">&#128274;</div>
+              <div class="locked-text">Cmd+Tab disabled &bull; Force Quit blocked</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step animate-on-scroll">
+          <div class="step-content">
+            <div class="step-number">3</div>
+            <h3>Write</h3>
+            <p>With no distractions possible, something interesting happens. The resistance fades. Words begin to flow. This is what writing feels like when it's the only option.</p>
+          </div>
+          <div class="step-visual">
+            <div class="step-mockup writing-mockup">
+              <span class="typed">The best ideas come when you stop fighting yourself. When you remove the option to procrastinate, all that's left is the work.</span><span class="editor-cursor"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step animate-on-scroll">
+          <div class="step-content">
+            <div class="step-number">4</div>
+            <h3>Export and repeat</h3>
+            <p>When the session ends, save your document wherever you'd like. Then do it again tomorrow. Build the habit.</p>
+          </div>
+          <div class="step-visual">
+            <div class="step-mockup export-mockup">
+              <div class="export-icon">&#128196;</div>
+              <div class="export-text">Session complete. 847 words written.</div>
+              <div class="export-filename">~/Documents/draft-chapter-3.txt</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="social-proof">
+    <div class="social-container animate-on-scroll">
+      <div class="testimonial">
+        <p class="testimonial-quote">"I've tried every productivity app. This is the only one that actually works because it doesn't give me a choice."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar"></div>
+          <div class="author-info">
+            <div class="author-name">Early User</div>
+            <div class="author-title">Writer & Newsletter Author</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="download" id="download">
+    <div class="download-bg"></div>
+    <div class="download-container animate-on-scroll">
+      <h2>Start writing today</h2>
+      <p class="download-subtitle">No subscriptions. No accounts. Just download, install, and write.</p>
+      <div class="download-buttons">
+        <a href="/download" class="download-btn mac">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          Get FocusWriter for Mac
+        </a>
+        <a href="#" class="download-btn windows" style="opacity: 0.5; cursor: not-allowed;">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 12V6.75l6-1.32v6.48L3 12zm17-9v8.75l-10 .15V5.21L20 3zM3 13l6 .09v6.81l-6-1.15V13zm17 .25V22l-10-1.91V13.1l10 .15z"/></svg>
+          Windows (Coming Soon)
+        </a>
+      </div>
+      <div class="price-tag">
+        <span class="price-amount">Free</span>
+        <span>for now</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq" id="faq">
+    <div class="faq-container">
+      <div class="faq-header animate-on-scroll">
+        <span class="section-label">FAQ</span>
+        <h2>Questions</h2>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item animate-on-scroll">
+          <h3>What if I have a real emergency?</h3>
+          <p>FocusWriter includes an emergency exit. Type the phrase "I understand this defeats the purpose of focused writing" to unlock early. It's intentionally inconvenient - easy enough for a genuine emergency, annoying enough that you won't use it to check Twitter.</p>
+        </div>
+        <div class="faq-item animate-on-scroll">
+          <h3>What macOS versions are supported?</h3>
+          <p>FocusWriter works on macOS 10.15 (Catalina) and later, including Apple Silicon Macs. Windows support is coming soon.</p>
+        </div>
+        <div class="faq-item animate-on-scroll">
+          <h3>What if the app crashes?</h3>
+          <p>Your work is auto-saved every few seconds to a recovery file. If anything goes wrong, your words will be waiting for you when you reopen the app.</p>
+        </div>
+        <div class="faq-item animate-on-scroll">
+          <h3>Can I use my own text editor?</h3>
+          <p>FocusWriter is a complete writing environment - you write directly in the app. When your session ends, you can export to a .txt or .md file and continue editing elsewhere.</p>
+        </div>
+        <div class="faq-item animate-on-scroll">
+          <h3>How much does it cost?</h3>
+          <p>FocusWriter is free for now while it's in early release. If that changes down the road, you'll keep what you've already downloaded.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="logo-icon" style="width: 20px; height: 20px; border-radius: 4px;"></div>
+        FocusWriter
+      </div>
+      <div class="footer-links">
+        <a href="https://moretothat.com">More To That</a>
+        <a href="mailto:hello@moretothat.com">Contact</a>
+        <a href="#">Privacy</a>
+      </div>
+      <div class="footer-copyright">
+        &copy; 2026 More To That
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll-triggered animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.animate-on-scroll').forEach(el => {
+      observer.observe(el);
+    });
+
+    // Smooth scroll for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+  </script>
+
+</body>
+</html>

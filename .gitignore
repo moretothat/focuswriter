@@ -2,3 +2,14 @@ node_modules/
 dist/
 *.log
 .DS_Store
+
+# Local-only auth/payment server — contains user data, do not commit
+server/
+
+# Native build artifacts
+native/build/
+src/DisableProcessSwitching
+
+# Env files
+.env
+.env.local

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download - FocusWriter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0a0b;
+      --bg-secondary: #111113;
+      --bg-tertiary: #18181b;
+      --bg-card: #1a1a1d;
+      --text-primary: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent-cyan: #22d3ee;
+      --accent-purple: #a78bfa;
+      --accent-blue: #3b82f6;
+      --accent-green: #4ade80;
+      --border-color: #27272a;
+      --gradient-2: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background-color: var(--bg-primary);
+      min-height: 100vh;
+    }
+
+    nav { padding: 16px 24px; border-bottom: 1px solid var(--border-color); }
+    .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 20px; font-weight: 700; color: var(--text-primary); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .logo-icon { width: 28px; height: 28px; background: var(--gradient-2); border-radius: 6px; }
+    .nav-back { font-size: 14px; color: var(--text-muted); text-decoration: none; }
+    .nav-back:hover { color: var(--text-secondary); }
+
+    .download-container { max-width: 800px; margin: 0 auto; padding: 80px 24px; }
+    .download-header { text-align: center; margin-bottom: 60px; }
+    .download-header h1 { font-size: 36px; font-weight: 700; margin-bottom: 12px; }
+    .download-header p { color: var(--text-secondary); font-size: 18px; }
+
+    .download-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 60px; }
+    @media (max-width: 600px) { .download-cards { grid-template-columns: 1fr; } }
+    .download-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 32px; text-align: center; transition: all 0.2s; }
+    .download-card:hover { border-color: var(--text-muted); }
+    .download-card.available:hover { border-color: var(--accent-cyan); }
+    .platform-icon { width: 48px; height: 48px; margin: 0 auto 20px; }
+    .platform-icon svg { width: 100%; height: 100%; }
+    .download-card h3 { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+    .download-card .version { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+
+    .download-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 14px 24px;
+      background: var(--gradient-2); color: var(--bg-primary);
+      border: none; border-radius: 10px;
+      font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none;
+      transition: all 0.2s;
+    }
+    .download-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(34, 211, 238, 0.3); }
+    .download-btn.disabled { background: var(--bg-tertiary); color: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; }
+    .download-btn svg { width: 18px; height: 18px; }
+    .coming-soon { font-size: 13px; color: var(--text-muted); margin-top: 12px; }
+
+    .getting-started { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; padding: 40px; }
+    .getting-started h2 { font-size: 24px; font-weight: 600; margin-bottom: 24px; }
+    .steps-list { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+    .steps-list li { display: flex; gap: 16px; }
+    .step-num { width: 28px; height: 28px; background: var(--bg-tertiary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--accent-cyan); flex-shrink: 0; }
+    .step-content { padding-top: 3px; }
+    .step-content strong { display: block; margin-bottom: 4px; }
+    .step-content p { color: var(--text-secondary); font-size: 14px; }
+    .step-content code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; color: var(--accent-cyan); }
+
+    .support { text-align: center; margin-top: 60px; padding-top: 40px; border-top: 1px solid var(--border-color); }
+    .support p { color: var(--text-muted); font-size: 14px; }
+    .support a { color: var(--accent-cyan); text-decoration: none; }
+    .support a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-container">
+      <a href="/" class="logo">
+        <div class="logo-icon"></div>
+        FocusWriter
+      </a>
+      <a href="/" class="nav-back">&larr; Back to home</a>
+    </div>
+  </nav>
+
+  <div class="download-container">
+    <div class="download-header">
+      <h1>Download FocusWriter</h1>
+      <p>Free for now. Mac only. Windows coming soon.</p>
+    </div>
+
+    <div class="download-cards">
+      <div class="download-card available">
+        <div class="platform-icon">
+          <svg viewBox="0 0 24 24" fill="var(--text-primary)">
+            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+          </svg>
+        </div>
+        <h3>macOS (Apple Silicon)</h3>
+        <div class="version">Version 1.0.0 &bull; 90 MB</div>
+        <a href="https://github.com/moretothat/focuswriter/releases/download/v1.0.0/FocusWriter-1.0.0-arm64.dmg" class="download-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Download for Mac
+        </a>
+      </div>
+
+      <div class="download-card">
+        <div class="platform-icon">
+          <svg viewBox="0 0 24 24" fill="var(--text-muted)">
+            <path d="M3 12V6.75l6-1.32v6.48L3 12zm17-9v8.75l-10 .15V5.21L20 3zM3 13l6 .09v6.81l-6-1.15V13zm17 .25V22l-10-1.91V13.1l10 .15z"/>
+          </svg>
+        </div>
+        <h3>Windows</h3>
+        <div class="version">Coming soon</div>
+        <button class="download-btn disabled" disabled>
+          Coming Soon
+        </button>
+      </div>
+    </div>
+
+    <div class="getting-started">
+      <h2>Getting started</h2>
+      <ol class="steps-list">
+        <li>
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <strong>Open the downloaded file</strong>
+            <p>Double-click the <code>.dmg</code> file to mount it.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <strong>Drag to Applications</strong>
+            <p>Drag FocusWriter to your Applications folder.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <strong>Grant permissions</strong>
+            <p>On first launch, right-click the app and choose Open. You may need to allow it in System Settings &rsaquo; Privacy &amp; Security.</p>
+          </div>
+        </li>
+        <li>
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <strong>Start writing</strong>
+            <p>Choose a time or word goal, and lock yourself in. Happy writing!</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="support">
+      <p>Need help? Email <a href="mailto:hello@moretothat.com">hello@moretothat.com</a></p>
+    </div>
+  </div>
+</body>
+</html>
